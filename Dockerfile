@@ -32,3 +32,4 @@ CMD ["/usr/bin/apachectl", "start",  "-DFOREGROUND"]
 #securityalert after install
 #sslsupport
 #testing
+#intelligent setup-output
