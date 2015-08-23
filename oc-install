@@ -1,0 +1,44 @@
+#!/bin/bash
+
+
+##function definitions
+function start_psql {
+    su - postgres -c "pg_ctl start -D /var/lib/postgres/data -l /var/log/postgres/log"
+}
+
+
+if [ "$DB_EXTERNAL" = false ]; then
+
+    if [ ! -d /var/lib/postgres/data/base ]; then
+
+        echo 'no local postgres database found'
+        echo '### Installing database ###'
+
+        chown postgres /var/lib/postgres/data
+        chgrp postgres /var/lib/postgres/data
+        chmod u=rwx,g-rwx,o-rwx /var/lib/postgres/data
+        su - postgres -c "initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgres/data'"
+        start_psql
+        sleep 2 #wait for postgres till started
+        su - postgres -c "psql -c \"CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';\""  
+        su - postgres -c "psql -c \"CREATE DATABASE $DB_NAME OWNER $DB_USER;;\""
+    else
+        echo 'existing postgres database found, starting postgres...'
+        start_psql
+    fi 
+
+fi
+
+
+   
+if [ ! -d /srv/http/config ]; then
+    
+    echo '### Downloading owncloud webinstaller ###'
+    curl https://download.owncloud.com/download/community/setup-owncloud.php > /srv/http/setup-owncloud.php
+    
+    chown -R http /srv/http/
+
+fi
+
+
+exec $@
