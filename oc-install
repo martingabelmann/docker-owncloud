@@ -35,7 +35,9 @@ if [ ! -d /srv/http/config ]; then
     
     echo '### Downloading owncloud webinstaller ###'
     curl https://download.owncloud.com/download/community/setup-owncloud.php > /srv/http/setup-owncloud.php
-    chown -R http /srv/http/
+    
+    mkdir /srv/http/data
+    chown -R http:http /srv/http/
     
     echo '### running owncloud webinstaller ###'
     echo '...this may take a while...'
@@ -47,10 +49,6 @@ if [ ! -d /srv/http/config ]; then
     ocpath='/srv/http'
     htuser='http'
     htgroup='http'
-    
-    mkdir /srv/http/data
-    touch ${ocpath}/.htaccess
-    touch ${ocpath}/data/.htaccess
 
     find ${ocpath}/ -type f -print0 | xargs -0 chmod 0640
     find ${ocpath}/ -type d -print0 | xargs -0 chmod 0750
@@ -60,12 +58,6 @@ if [ ! -d /srv/http/config ]; then
     chown -R ${htuser}:${htgroup} ${ocpath}/config/
     chown -R ${htuser}:${htgroup} ${ocpath}/data/
     chown -R ${htuser}:${htgroup} ${ocpath}/themes/
-    
-    chown root:${htuser} ${ocpath}/.htaccess
-    chown root:${htuser} ${ocpath}/data/.htaccess
-    
-    chmod 0644 ${ocpath}/.htaccess
-    chmod 0644 ${ocpath}/data/.htaccess
     
     echo 'Gratulations! Point your browser to your new owncloud instance.'
 
