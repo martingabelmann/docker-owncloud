@@ -32,24 +32,28 @@ fi
 
 
    
-if [ ! -d /srv/http/config ]; then
+if [ ! -e /srv/http/index.php ]; then
     
+    echo '### no owncloud webfiles found ###'  
     echo '### downloading owncloud webinstaller ###'
     curl https://download.owncloud.com/download/community/setup-owncloud.php > /srv/http/setup-owncloud.php
-    
-    echo '### creating data-dir ###'
-    mkdir "$OC_DATADIR"
-    chown -R http:http /srv/http/
-    
+   
     echo '### running owncloud webinstaller ###'
     echo '...this may take a while...'
     echo ""| php -R 'include("/srv/http/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
+fi
 
+if [ ! -e /srv/http/data/config/config.php ]; then
+    
+    echo '### no owncloud config-files found ###'
+    mkdir -p data
+    mv -f config data/
+    ln -s data/config config
 
     echo '### writing config-files ###'
     #enable memcache
     #notice: here-documents only support real tabs
-	cat <<-EOF >/srv/http/config/config.php
+	cat <<-EOF >/srv/http/data/config/config.php
 		<?php
 		\$CONFIG = array (
 			'memcache.local' => '\\\\OC\\\\Memcache\\\\XCache',
@@ -58,7 +62,7 @@ if [ ! -d /srv/http/config ]; then
 
     #write autoconfig
     #notice: here-documents only support real tabs
-	cat <<-EOF >/srv/http/config/autoconfig.php
+	cat <<-EOF >/srv/http/data/config/autoconfig.php
 		<?php
 		\$AUTOCONFIG = array (
 		"dbtype"        => "$DB_TYPE",
@@ -72,8 +76,14 @@ if [ ! -d /srv/http/config ]; then
 		"directory"     => "$OC_DATADIR",
 		);
 	EOF
- 
- 
+
+else
+   
+   echo '### existing config-files found, migrating... ###' 
+   rm -rf /srv/http/config
+   ln -s data/config config
+
+fi
 
     echo '### fixing directory premissions ###'    
     #from https://doc.owncloud.org/server/8.0/admin_manual/installation/installation_wizard.html
@@ -87,13 +97,10 @@ if [ ! -d /srv/http/config ]; then
     chown -R root:${htuser} ${ocpath}/
     chown -R ${htuser}:${htgroup} ${ocpath}/apps/
     chown -R ${htuser}:${htgroup} ${ocpath}/config/
-    chown -R ${htuser}:${htgroup} ${ocpath}/data/
+    chown -R ${htuser}:${htgroup} ${OC_DATADIR}
     chown -R ${htuser}:${htgroup} ${ocpath}/themes/
     
    
     echo '### Gratulations! Point your browser to your new owncloud instance. ###'
-
-fi
-
 
 exec $@

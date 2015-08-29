@@ -19,7 +19,7 @@ RUN /usr/bin/install -g http -m 775  -d /run/httpd
 RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
 RUN /usr/bin/install -o postgres -d /var/log/postgres
 
-VOLUME ["/srv/http/"]
+VOLUME ["/srv/http/", "/srv/http/data/"]
 
 ADD oc-install /usr/local/bin/oc-install
 ADD httpd.conf /etc/httpd/conf/httpd.conf
