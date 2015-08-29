@@ -24,6 +24,11 @@ VOLUME ["/srv/http/"]
 ADD oc-install /usr/local/bin/oc-install
 ADD httpd.conf /etc/httpd/conf/httpd.conf
 ADD php.ini /etc/php/php.ini
+ADD server.key /server.key
+ADD server.crt /server.crt
+
+RUN ln -s /server.key /etc/httpd/conf/server.key
+RUN ln -s /server.crt /etc/httpd/conf/server.crt
 
 EXPOSE 80
 EXPOSE 433
