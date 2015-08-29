@@ -1,11 +1,17 @@
 FROM l3iggs/archlinux
 MAINTAINER martin@gabelmann.biz
 
-ENV DB_NAME=owncloud_db \
+ENV DB_TYPE=pgsql \
+    DB_HOST=localhost \
+    DB_NAME=owncloud_db \
     DB_USER=owncloud \
+    DB_PREFIX="" \
     DB_PASS=changemepls \
-    DB_EXTERNAL=false
-
+    DB_EXTERNAL=false \
+    OC_ADMIN=admin \
+    OC_ADMINPASS=changemepls \
+    OC_DATADIR=/srv/http/data
+    
 RUN pacman -Syyu --noconfirm &&\
     pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg php-xcache --noconfirm --needed
 

@@ -35,24 +35,39 @@ if [ ! -d /srv/http/config ]; then
     echo '### Downloading owncloud webinstaller ###'
     curl https://download.owncloud.com/download/community/setup-owncloud.php > /srv/http/setup-owncloud.php
     
-    mkdir /srv/http/data
+    mkdir "$OC_DATADIR"
     chown -R http:http /srv/http/
     
     echo '### running owncloud webinstaller ###'
     echo '...this may take a while...'
     echo ""| php -R 'include("/srv/http/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
 
-
-
     #enable memcache
     #notice: here-documents only support real tabs
 	cat <<-EOF >/srv/http/config/config.php
 		<?php
 		\$CONFIG = array (
-		'memcache.local' => '\\\\OC\\\\Memcache\\\\XCache',
+			'memcache.local' => '\\\\OC\\\\Memcache\\\\XCache',
 		);
 	EOF
-    
+
+    #write autoconfig
+    #notice: here-documents only support real tabs
+	cat <<-EOF >/srv/http/config/autoconfig.php
+		<?php
+		\$AUTOCONFIG = array (
+		"dbtype"        => "$DB_TYPE",
+		"dbname"        => "$DB_NAME",
+		"dbuser"        => "$DB_USER",
+		"dbpass"        => "$DB_PASS",
+		"dbhost"        => "$DB_HOST",
+		"dbtableprefix" => "$DB_PREFIX",
+		"adminlogin"    => "$OC_ADMIN",
+		"adminpass"     => "$OC_ADMINPASS",
+		"directory"     => "$OC_DATADIR",
+		);
+	EOF
+ 
  
 
     echo 'fixing directory premissions'    
