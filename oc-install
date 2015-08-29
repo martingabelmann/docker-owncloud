@@ -14,8 +14,7 @@ if [ "$DB_EXTERNAL" = false ]; then
         echo 'no local postgres database found'
         echo '### Installing database ###'
 
-        chown postgres /var/lib/postgres/data
-        chgrp postgres /var/lib/postgres/data
+        chown postgres:postgres /var/lib/postgres/data
         chmod u=rwx,g-rwx,o-rwx /var/lib/postgres/data
         su - postgres -c "initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgres/data'"
         start_psql
@@ -42,7 +41,19 @@ if [ ! -d /srv/http/config ]; then
     echo '### running owncloud webinstaller ###'
     echo '...this may take a while...'
     echo ""| php -R 'include("/srv/http/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
+
+
+
+    #enable memcache
+    #notice: here-documents only support real tabs
+	cat <<-EOF >/srv/http/config/config.php
+		<?php
+		\$CONFIG = array (
+		'memcache.local' => '\\\\OC\\\\Memcache\\\\XCache',
+		);
+	EOF
     
+ 
 
     echo 'fixing directory premissions'    
     #from https://doc.owncloud.org/server/8.0/admin_manual/installation/installation_wizard.html
@@ -59,6 +70,7 @@ if [ ! -d /srv/http/config ]; then
     chown -R ${htuser}:${htgroup} ${ocpath}/data/
     chown -R ${htuser}:${htgroup} ${ocpath}/themes/
     
+   
     echo 'Gratulations! Point your browser to your new owncloud instance.'
 
 fi

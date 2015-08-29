@@ -7,7 +7,7 @@ ENV DB_NAME=owncloud_db \
     DB_EXTERNAL=false
 
 RUN pacman -Syyu --noconfirm &&\
-    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg  --noconfirm --needed
+    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg php-xcache --noconfirm --needed
 
 RUN /usr/bin/install -g http -m 775  -d /run/httpd
 RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
