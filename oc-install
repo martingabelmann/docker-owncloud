@@ -3,8 +3,8 @@
 
 ##function definitions
 function start_psql {
-    su - postgres -c "pg_ctl start -D /var/lib/postgres/data -l /var/log/postgres/log"
     echo '### starting database server ###'
+    su - postgres -c "pg_ctl start -D /var/lib/postgres/data -l /var/log/postgres/log"
 }
 
 

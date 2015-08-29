@@ -35,7 +35,6 @@ CMD ["/usr/bin/apachectl", "start",  "-DFOREGROUND"]
 
 #TODO
 #docker stop gracefully
-#securityalert after install
 #sslsupport
 #testing
 #intelligent setup-output
