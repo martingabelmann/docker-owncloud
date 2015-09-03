@@ -48,7 +48,9 @@ if [ ! -e /srv/http/data/config/config.php ]; then
     echo '### no owncloud config-files found ###'
     mkdir -p data
     mv -f config data/
+    mv -f apps data/
     ln -s data/config config
+    ln -s data/apps apps
 
     echo '### writing config-files ###'
     #enable memcache
@@ -81,7 +83,9 @@ else
    
    echo '### existing config-files found, migrating... ###' 
    rm -rf /srv/http/config
+   rm -rf /srv/http/apps
    ln -s data/config config
+   ln -s data/apps apps
 
 fi
 
