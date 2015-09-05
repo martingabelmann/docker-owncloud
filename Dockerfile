@@ -19,16 +19,14 @@ RUN /usr/bin/install -g http -m 775  -d /run/httpd
 RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
 RUN /usr/bin/install -o postgres -d /var/log/postgres
 
-VOLUME ["/srv/http/", "/srv/http/data/"]
+VOLUME ["/ssl/", "/srv/http/", "/srv/http/data/"]
 
 ADD oc-install /usr/local/bin/oc-install
 ADD httpd.conf /etc/httpd/conf/httpd.conf
 ADD php.ini /etc/php/php.ini
-ADD server.key /server.key
-ADD server.crt /server.crt
+ADD server.key /ssl/server.key
+ADD server.crt /ssl/server.crt
 
-RUN ln -s /server.key /etc/httpd/conf/server.key
-RUN ln -s /server.crt /etc/httpd/conf/server.crt
 
 EXPOSE 80
 EXPOSE 433

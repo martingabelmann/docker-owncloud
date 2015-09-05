@@ -103,7 +103,10 @@ fi
     chown -R ${htuser}:${htgroup} ${ocpath}/config/
     chown -R ${htuser}:${htgroup} ${OC_DATADIR}
     chown -R ${htuser}:${htgroup} ${ocpath}/themes/
-    
+   
+    chown -R root:root /ssl/
+    chmod 600 /ssl
+    chmod -R 700  /ssl/
    
     echo '### Gratulations! Point your browser to your new owncloud instance. ###'
 
