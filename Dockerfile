@@ -10,7 +10,10 @@ ENV DB_TYPE=pgsql \
     DB_EXTERNAL=false \
     OC_ADMIN=admin \
     OC_ADMINPASS=changemepls \
-    OC_DATADIR=/srv/http/data
+    OC_DATADIR=/srv/http/data \
+    OC_EMAIL="admin@localhost" \
+    OC_DOMAIN="localhost"
+
     
 RUN pacman -Syyu --noconfirm &&\
     pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg php-xcache --noconfirm --needed
