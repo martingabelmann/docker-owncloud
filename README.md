@@ -13,6 +13,7 @@ It is highly recommend to use owncloud with ssl, so the apache-settings are forc
 Assuming you owning (trusted) ssl-certificates at 
  - ``/srv/docker/owncloud/ssl/server.key`` and 
  - ``/srv/docker/owncloud/ssl/server.crt``,
+ 
 that are beloging to the domain  ``example.org``,
 
 choose a good database- and adminpassword, then type:
@@ -28,6 +29,6 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
 
 This will mount and use the certificates. Your data is stored on your host at ``/srv/docker/owncloud/data/`` and the postgres database at ``/srv/docker/owncloud/sql``. 
 
-Your config- and app-directories are also placed into ``/srv/docker/owncloud/data/`` (and linked onto the right place in the container).
+OwnClouds config- and app-directories are also placed into ``/srv/docker/owncloud/data/`` (and linked onto the right place in the container).
 
 The first run will take a while because the recent owncloud-version will be downloaded and exctracted. 
