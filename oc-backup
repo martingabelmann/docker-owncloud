@@ -1,0 +1,83 @@
+#!/bin/bash
+
+FILE="owncloud_`date +'%Y%m%d_%H%M'`".tar.gz
+BACKUP=false
+RESTORE=false
+USAGE=true
+
+
+while [[ $# > 0 ]]
+do
+    key="$1"
+    case $key in
+
+            -b|--backup)
+            USAGE=false
+            BACKUP=true
+            shift
+            ;;
+            -r|--restore)
+            RESTORE="$2"
+            USAGE=false
+            shift
+            ;;
+            -h|--help)
+            USAGE=true
+            ;;
+            *)
+            ;;
+    esac
+    shift
+done
+
+
+if [ "$USAGE" == "true" ]; then
+    
+    echo "Usage:"
+    echo "backup -b";
+    echo "tar owncloud data, config, apps and postgres database into backupdir {ownclouddir}/data/backups/. The backup is called  ${FILE}.";
+    echo "";
+    echo "backup -r backup.tar.gz";
+    echo "restore the file backup.tar.gz. It has to be located in {ownclouddir}/data/backups/";
+    exit 1;
+
+fi
+
+if [ $BACKUP != "false" ]; then
+    
+    mkdir -p /srv/http/data/backups
+    BACKUP_COUNT=$(ls -b /srv/http/data/backups/ | wc -l)
+    MAX_BACKUPS=3
+
+    if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
+        OLDEST="$(ls -tr /srv/http/data/backups/ | head -n 1)"
+        echo "removing oldest backup file:"
+        if [ -f /srv/http/data/backups/$OLDEST ]; then  
+            rm -rfv /srv/http/data/backups/$OLDEST 
+        fi
+    fi
+
+    echo "compressing owncloud data, config and app files to $FILE ...";
+    tar -cpf /srv/http/data/backups/$FILE --exclude=/srv/http/data/backups /srv/http/data
+
+    if [ "$DB_EXTERNAL" = false ]; then
+        echo "appending postgres database to $FILE"
+        tar -upf /srv/http/data/backups/$FILE /var/lib/postgres/data/
+    fi
+
+    echo "done";
+
+fi
+
+
+
+if [ $RESTORE != "false" ]; then
+    
+    echo "Restoring $RESTORE ...";
+    [ ! -e /srv/http/data/backups/$RESTORE ] && echo "fatal: file /srv/http/data/backups/$RESTORE not found." && exit 0;
+    tar -xpf /srv/http/data/backups/$RESTORE -C /
+    echo "done";
+
+fi
+
+

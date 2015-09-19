@@ -25,6 +25,7 @@ RUN /usr/bin/install -o postgres -d /var/log/postgres
 VOLUME ["/ssl/", "/srv/http/", "/srv/http/data/"]
 
 ADD oc-install /usr/local/bin/oc-install
+ADD oc-backup /usr/local/bin/backup
 ADD httpd.conf /etc/httpd/conf/httpd.conf
 ADD php.ini /etc/php/php.ini
 ADD server.key /ssl/server.key
@@ -38,9 +39,3 @@ WORKDIR /srv/http/
 
 ENTRYPOINT ["oc-install"]
 CMD ["/usr/bin/apachectl", "start",  "-DFOREGROUND"]
-
-#TODO
-#docker stop gracefully
-#sslsupport
-#testing
-#intelligent setup-output
