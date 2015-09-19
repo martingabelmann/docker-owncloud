@@ -1,11 +1,42 @@
 #!/bin/bash
 
+
+
+#remove old backup files
+function remove_old_backups() {
+ 
+    BACKUP_COUNT=$(ls -b /srv/http/data/backups/ | wc -l)
+    MAX_BACKUPS=$1
+
+    if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
+        
+        OLDEST="$(ls -tr /srv/http/data/backups/ | head -n 1)"
+        echo "removing backup file:"
+        
+        if [ -f /srv/http/data/backups/$OLDEST ]; then  
+            rm -rfv /srv/http/data/backups/$OLDEST 
+        fi
+        
+        if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
+            remove_old_backups $MAX_BACKUPS
+        fi
+
+    fi
+
+}
+
+
+
+
+# backup file name
 FILE="owncloud_`date +'%Y%m%d_%H%M'`".tar.gz
+
+#default arguments
 BACKUP=false
 RESTORE=false
 USAGE=true
 
-
+#parse arguments
 while [[ $# > 0 ]]
 do
     key="$1"
@@ -31,7 +62,7 @@ do
 done
 
 
-if [ "$USAGE" == "true" ]; then
+if [ "$USAGE" = true ]; then
     
     echo "Usage:"
     echo "backup -b";
@@ -43,20 +74,11 @@ if [ "$USAGE" == "true" ]; then
 
 fi
 
-if [ $BACKUP != "false" ]; then
+if [ "$BACKUP" != false ]; then
     
     mkdir -p /srv/http/data/backups
-    BACKUP_COUNT=$(ls -b /srv/http/data/backups/ | wc -l)
-    MAX_BACKUPS=3
-
-    if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
-        OLDEST="$(ls -tr /srv/http/data/backups/ | head -n 1)"
-        echo "removing oldest backup file:"
-        if [ -f /srv/http/data/backups/$OLDEST ]; then  
-            rm -rfv /srv/http/data/backups/$OLDEST 
-        fi
-    fi
-
+    remove_old_backups 3
+    
     echo "compressing owncloud data, config and app files to $FILE ...";
     tar -cpf /srv/http/data/backups/$FILE --exclude=/srv/http/data/backups /srv/http/data
 
@@ -71,10 +93,10 @@ fi
 
 
 
-if [ $RESTORE != "false" ]; then
+if [ "$RESTORE" != false ]; then
     
     echo "Restoring $RESTORE ...";
-    [ ! -e /srv/http/data/backups/$RESTORE ] && echo "fatal: file /srv/http/data/backups/$RESTORE not found." && exit 0;
+    [ ! -f /srv/http/data/backups/$RESTORE ] && echo "fatal: file /srv/http/data/backups/$RESTORE not found." && exit 0;
     tar -xpf /srv/http/data/backups/$RESTORE -C /
     echo "done";
 
