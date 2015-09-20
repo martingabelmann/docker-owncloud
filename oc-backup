@@ -2,16 +2,27 @@
 
 
 
+#count existing backup files
+function count_backups() {
+    
+    if [ -d /srv/http/data/backups/ ]; then
+        echo $(ls -b /srv/http/data/backups/ | wc -l)
+    else
+        echo 0
+    fi
+}
+
+
 #remove old backup files
 function remove_old_backups() {
  
-    BACKUP_COUNT=$(ls -b /srv/http/data/backups/ | wc -l)
+    BACKUP_COUNT=$(count_backups)
     MAX_BACKUPS=$1
 
     if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
         
         OLDEST="$(ls -tr /srv/http/data/backups/ | head -n 1)"
-        echo "removing backup file:"
+        echo "removing old backup file:"
         
         if [ -f /srv/http/data/backups/$OLDEST ]; then  
             rm -rfv /srv/http/data/backups/$OLDEST 
@@ -34,6 +45,7 @@ FILE="owncloud_`date +'%Y%m%d_%H%M'`".tar.gz
 #default arguments
 BACKUP=false
 RESTORE=false
+LIST=false
 USAGE=true
 
 #parse arguments
@@ -47,8 +59,13 @@ do
             BACKUP=true
             shift
             ;;
-            -r|--restore)
+             -r|--restore)
             RESTORE="$2"
+            USAGE=false
+            shift
+            ;;
+            -l|--list)
+            LIST=true
             USAGE=false
             shift
             ;;
@@ -80,7 +97,7 @@ if [ "$BACKUP" != false ]; then
     remove_old_backups 3
     
     echo "compressing owncloud data, config and app files to $FILE ...";
-    tar -cpf /srv/http/data/backups/$FILE --exclude=/srv/http/data/backups /srv/http/data
+    tar --exclude=/srv/http/data/backups -cpf /srv/http/data/backups/$FILE /srv/http/data
 
     if [ "$DB_EXTERNAL" = false ]; then
         echo "appending postgres database to $FILE"
@@ -102,4 +119,15 @@ if [ "$RESTORE" != false ]; then
 
 fi
 
+if [ "$LIST" != false ]; then
 
+    BACKUP_COUNT=$(count_backups)
+    if [ "$BACKUP_COUNT" -gt 0 ]; then
+        echo "$BACKUP_COUNT available backup files:";
+        ls -gGth /srv/http/data/backups/|cut -d " " -f 3-
+        echo "Total: $(du -h /srv/http/data/backups/|awk '{print $1}')"
+    else
+        echo "No backup files found";
+    fi
+
+fi
