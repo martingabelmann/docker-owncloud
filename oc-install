@@ -111,7 +111,15 @@ fi
     echo '### configuring apache ###'
     sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/httpd/conf/httpd.conf 
     sed -i 's/ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/httpd.conf 
-     
+    
+    if [ "$OC_BACKUP_CRON" != "no" ]; then
+       echo "### set up backup cron ###"
+       fcron -b -p /var/log/cron.log
+       echo "OC_BACKUP_FILES=$OC_BACKUP_FILES
+       $OC_BACKUP_CRON /usr/local/bin/backup -b 2>&1 | tee /var/log/backup.log"| fcrontab - 
+    fi
+
+
     echo '### Gratulations! Point your browser to your new owncloud instance. ###'
 
 exec $@

@@ -28,9 +28,7 @@ function remove_old_backups() {
             rm -rfv /srv/http/data/backups/$OLDEST 
         fi
         
-        if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
-            remove_old_backups $MAX_BACKUPS
-        fi
+        remove_old_backups $MAX_BACKUPS
 
     fi
 
@@ -94,7 +92,6 @@ fi
 if [ "$BACKUP" != false ]; then
     
     mkdir -p /srv/http/data/backups
-    remove_old_backups 3
     
     echo "compressing owncloud data, config and app files to $FILE ...";
     tar --exclude=/srv/http/data/backups -cpf /srv/http/data/backups/$FILE /srv/http/data
@@ -104,6 +101,7 @@ if [ "$BACKUP" != false ]; then
         tar -upf /srv/http/data/backups/$FILE /var/lib/postgres/data/
     fi
 
+    remove_old_backups $OC_BACKUP_FILES
     echo "done";
 
 fi

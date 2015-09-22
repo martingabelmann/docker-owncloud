@@ -12,11 +12,13 @@ ENV DB_TYPE=pgsql \
     OC_ADMINPASS=changemepls \
     OC_DATADIR=/srv/http/data \
     OC_EMAIL="admin@localhost" \
-    OC_DOMAIN="localhost"
-
+    OC_DOMAIN="localhost" \
+    OC_BACKUP_CRON=no \
+    OC_BACKUP_FILES=1 \
+    OC_BACKUP_DIR=/srv/http/data/backups
     
 RUN pacman -Syyu --noconfirm &&\
-    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg php-xcache --noconfirm --needed
+    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg php-xcache fcron --noconfirm --needed
 
 RUN /usr/bin/install -g http -m 775  -d /run/httpd
 RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
