@@ -46,6 +46,9 @@ OwnClouds config- and app-directories are also placed into ``/srv/docker/ownclou
 
 The first run will take a while because the recent owncloud-version will be downloaded and exctracted. 
 
+Check ``docker logs oc`` to verify that everything is done. Then point your browser to ``https://example.org/``. On the first vistit/install Owncloud will do some configurations and directly login into to the admin panel.
+
+
 ####Backups
 The image provides a script called ``backup`` which is used to tar the data, config, apps and sql directories into OC_BACKUP_DIR and extract existing tarfiles from there into the corresponig destinations.
 
