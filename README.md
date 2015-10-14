@@ -5,9 +5,9 @@ _Inspired by [l3iggs/docker-owncloud](https://github.com/l3iggs/docker-owncloud)
  * [Features](#features)
  * [Basic Usage](#basics)
  * [Backups](#backups)
-   * [#manual](Manual)
-   * [#automatic](Automatic)
-   * [#restore](Restore) 
+   * [Manual](#manual)
+   * [Automatic](#automatic)
+   * [Restore](#restore) 
 
 ####Features
  - Full owncloud instance
