@@ -1,13 +1,23 @@
 #OwnCloud with Docker
 _Inspired by [l3iggs/docker-owncloud](https://github.com/l3iggs/docker-owncloud)_
- 
-full description comming soon
- 
-####basic usage:  
+
+### ToC
+ * [features](#features)
+ * [basic usage](#basics)
+ * [backups](#backups)
+
+####features
+ - full owncloud instance
+ - oneclick/run installation
+ - enforced ssl encryption 
+ - backup cronjobs
+
+####basics
 Get the image:
 ```
 docker pull martingabelmann/owncloud
 ```
+
 It is highly recommend to use owncloud with ssl, so the apache-settings are forcing the browser to use ``https://``. There are certificates build in the image for testing but in production you`ll have to use your own:
 
 Assuming you owning (trusted) ssl-certificates at 
@@ -32,3 +42,42 @@ This will mount and use the certificates. Your data is stored on your host at ``
 OwnClouds config- and app-directories are also placed into ``/srv/docker/owncloud/data/`` (and linked onto the right place in the container).
 
 The first run will take a while because the recent owncloud-version will be downloaded and exctracted. 
+
+####backups
+The image provides a script called ``backup`` which is used to tar the data, config, apps and sql directories into OC_BACKUP_DIR and extract existing tarfiles from there into the corresponig destinations.
+
+#####manual
+ - You can either join the containers bash with a
+ ```
+ docker exec -ti oc bash
+ ```
+ and run the ``backup [options]``-command from there or run it directly from the host:
+ ``` docker exec -ti oc backup [options]```.
+ 
+ 
+ - To perform a new backup run ``backup -b``. The file is called like ``owncloud_yearmonthday_time.tar.gz`. Depending on the variable ``OC_BACKUP_FILES``  (default=1), old backupfiles will be deleted.
+
+
+#####automatic
+The installscript is able to set a cronjob with that backup script. Because some people may have less storage it is disabled by default. To enable it just set the ``OC_BACKUP_CRON`` variable with the usual cron shurtcuts (see [here](http://fcron.free.fr/doc/en/fcrontab.5.html#AEN2144), e.g. to do a daily backup at midnight use ``-e OC_BACKUP_CRON='@midnight'``).
+ 
+ 
+ Full example to store the last 2 backups done at every midnight:
+
+```
+docker run --name=oc -d -p 443:443 -p 80:80 \
+  -e DB_PASS=changemepls -e OC_ADMINPASS=changemepls \
+  -e OC_DOMAIN=example.org -e OC_EMAIL=admin@example.org \
+  -e OC_BACKUP_FILES=2 \
+  -e OC_BACKUP_CRON='@midnight' \
+  -v /srv/docker/owncloud/data/:/srv/http/data/ \
+  -v /srv/docker/owncloud/sql/:/var/lib/postgres/data/ \
+  -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
+```
+ 
+#####restore
+ - Get a list of all available backups with ``backup -l``,
+ - copy the filename of your choise (including extension),
+ - restore with ``backup -r filename.tar.gz``
+
+However I can not give full warranty that restoring backups will work in every situatio! It passed my daily tests but in some configurations you may have to restor single files by hand.
