@@ -1,24 +1,27 @@
 #OwnCloud with Docker
 _Inspired by [l3iggs/docker-owncloud](https://github.com/l3iggs/docker-owncloud)_
 
-### ToC
- * [features](#features)
- * [basic usage](#basics)
- * [backups](#backups)
+### Table of Contents
+ * [Features](#features)
+ * [Basic Usage](#basics)
+ * [Backups](#backups)
+   * [#manual](Manual)
+   * [#automatic](Automatic)
+   * [#restore](Restore) 
 
-####features
- - full owncloud instance
- - oneclick/run installation
- - enforced ssl encryption 
- - backup cronjobs
+####Features
+ - Full owncloud instance
+ - OneClick/Run installation
+ - Enforced ssl encryption 
+ - Backup cronjobs
 
-####basics
+####Basics
 Get the image:
 ```
 docker pull martingabelmann/owncloud
 ```
 
-It is highly recommend to use owncloud with ssl, so the apache-settings are forcing the browser to use ``https://``. There are certificates build in the image for testing but in production you`ll have to use your own:
+It is highly recommended to use owncloud with ssl, so the apache-settings are forcing the browser to use ``https://``. There are certificates build in the image for testing but in production you`ll have to use your own:
 
 Assuming you owning (trusted) ssl-certificates at 
  - ``/srv/docker/owncloud/ssl/server.key`` and 
@@ -43,23 +46,25 @@ OwnClouds config- and app-directories are also placed into ``/srv/docker/ownclou
 
 The first run will take a while because the recent owncloud-version will be downloaded and exctracted. 
 
-####backups
+####Backups
 The image provides a script called ``backup`` which is used to tar the data, config, apps and sql directories into OC_BACKUP_DIR and extract existing tarfiles from there into the corresponig destinations.
 
-#####manual
+#####Manual
  - You can either join the containers bash with a
  ```
  docker exec -ti oc bash
  ```
  and run the ``backup [options]``-command from there or run it directly from the host:
- ``` docker exec -ti oc backup [options]```.
+ ``` 
+ docker exec -ti oc backup [options]
+ ```
  
- 
- - To perform a new backup run ``backup -b``. The file is called like ``owncloud_yearmonthday_time.tar.gz`. Depending on the variable ``OC_BACKUP_FILES``  (default=1), old backupfiles will be deleted.
+ - To perform a new backup run ``backup -b``. The file is placed into ``data/backups`` and called like ``owncloud_yearmonthday_time.tar.gz``. Depending on the variable ``OC_BACKUP_FILES``  (default=1), old backupfiles will be deleted.
 
 
-#####automatic
-The installscript is able to set a cronjob with that backup script. Because some people may have less storage it is disabled by default. To enable it just set the ``OC_BACKUP_CRON`` variable with the usual cron shurtcuts (see [here](http://fcron.free.fr/doc/en/fcrontab.5.html#AEN2144), e.g. to do a daily backup at midnight use ``-e OC_BACKUP_CRON='@midnight'``).
+#####Automatic
+The installscript is able to set a cronjob with that backup script. Because some people may have less storage it is disabled by default. To enable it just set the ``OC_BACKUP_CRON`` variable with the usual cron shurtcuts (see [here](http://fcron.free.fr/doc/en/fcrontab.5.html#AEN2144), e.g. to do a daily backup at midnight use 
+``-e OC_BACKUP_CRON='@midnight'``).
  
  
  Full example to store the last 2 backups done at every midnight:
@@ -75,9 +80,9 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
 ```
  
-#####restore
+#####Restore
  - Get a list of all available backups with ``backup -l``,
  - copy the filename of your choise (including extension),
  - restore with ``backup -r filename.tar.gz``
 
-However I can not give full warranty that restoring backups will work in every situatio! It passed my daily tests but in some configurations you may have to restor single files by hand.
+However I can not give full warranty that restoring backups will work in every situation! It passed my daily usage but in some special configurations you may have to use a external backup service.
