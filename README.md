@@ -8,6 +8,7 @@ _Inspired by [l3iggs/docker-owncloud](https://github.com/l3iggs/docker-owncloud)
    * [Manual](#manual)
    * [Automatic](#automatic)
    * [Restore](#restore) 
+ * [Testing](#testing)
 
 ####Features
  - Full owncloud instance
@@ -89,3 +90,15 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
  - restore with ``backup -r filename.tar.gz``
 
 However I can not give full warranty that restoring backups will work in every situation! It passed my daily usage but in some special configurations you may have to use a external backup service.
+
+#### Testing
+A minimal working owncloud instance can be run with
+
+```
+docker run --name=octest -d -p 44300:443 -p 8000:80 martingabelmann/owncloud
+```
+Then point your browser to ``https://localhost:44300``. The container will use the build-in certificates, so be carefully, dont use this in public networks/production!
+
+Debuginformations can be viewed with
+```docker logs oc```
+or from inside the container (``docker exec -ti oc``) under ``/var/log/`` about apache, postgresql, cron and backups.
