@@ -1,0 +1,3 @@
+#!/bin/bash
+
+su http -s /bin/bash -c "php occ $1"
