@@ -9,6 +9,7 @@ _Inspired by [l3iggs/docker-owncloud](https://github.com/l3iggs/docker-owncloud)
    * [Automatic](#automatic)
    * [Restore](#restore) 
  * [Testing](#testing)
+ * [OwnCloud cli](#OwnCloud_cli)
 
 ####Features
  - Full owncloud instance
@@ -102,3 +103,35 @@ Then point your browser to ``https://localhost:44300``. The container will use t
 Debuginformations can be viewed with
 ```docker logs oc```
 or from inside the container (``docker exec -ti oc``) under ``/var/log/`` about apache, postgresql, cron and backups.
+
+
+#### Owncloud cli
+
+OwnCloud offers the possibility to do administrative tasks via the command line interface `occ`. Just try it
+```
+docker exec oc occ help
+```
+
+
+#### Upgrades 
+Because the install script is downloading the newest stable version, updates can be easily done by removing the running container and starting a new one. Since the apps arent effected they will be upgraded by the webinterface on the next visit or via the command line. 
+
+I recommend to upgrade via `occ`:
+```
+docker exec oc occ upgrade
+```
+
+Sometimes it happens that a upgrade fails and breaks your OwnCloud webinterface because a app isnt compatible (or so). Then you have to disable the app with 
+```
+docker exec oc occ app:disable APPNAME
+```
+you may ask which apps are broken. Find out by observing `/srv/http/data/owncloud.log``. Check a specific app with
+
+```
+docker exec oc app:check APPNAME
+``` 
+for compatiblity. If it fails, install the newest/compatible version by copying into `/srv/data/apps/` (e.g. pulling from github). Afterwards try to enable it
+```
+docker exec oc app:enable APPNAME
+```
+If everything was successful you should be able to visit the webinterface again.
