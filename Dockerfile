@@ -18,7 +18,7 @@ ENV DB_TYPE=pgsql \
     OC_BACKUP_DIR=/srv/http/data/backups
     
 RUN pacman -Syyu --noconfirm &&\
-    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg php-xcache fcron --noconfirm --needed
+    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql ffmpeg php-apcu fcron --noconfirm --needed
 
 RUN /usr/bin/install -g http -m 775  -d /run/httpd
 RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
