@@ -58,7 +58,7 @@ if [ ! -e /srv/http/data/config/config.php ]; then
 	cat <<-EOF >/srv/http/data/config/config.php
 		<?php
 		\$CONFIG = array (
-			'memcache.local' => '\\\\OC\\\\Memcache\\\\XCache',
+			'memcache.local' => '\\OC\\Memcache\\APCu',
 		);
 	EOF
 
