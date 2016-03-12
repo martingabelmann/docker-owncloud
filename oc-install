@@ -34,13 +34,13 @@ fi
    
 if [ ! -e /srv/http/index.php ]; then
     
-    echo '### no owncloud webfiles found ###'
-    echo '### downloading latest commit ###'
-    curl -O https://download.owncloud.org/community/daily/owncloud-daily-master.tar.bz2
-    tar -jxf owncloud-daily-master.tar.bz2
-    rm -rf owncloud-daily-master.tar.bz2
-    mv owncloud/* .
-    rm -rf owncloud
+    echo '### no owncloud webfiles found ###'  
+    echo '### downloading owncloud webinstaller ###'
+    curl https://download.owncloud.com/download/community/setup-owncloud.php > /srv/http/setup-owncloud.php
+   
+    echo '### running owncloud webinstaller ###'
+    echo '...this may take a while...'
+    echo ""| php -R 'include("/srv/http/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
 fi
 
 if [ ! -e /srv/http/data/config/config.php ]; then
@@ -88,6 +88,7 @@ else
    ln -s data/apps apps
 
 fi
+
     echo '### fixing directory premissions ###'    
     #from https://doc.owncloud.org/server/8.0/admin_manual/installation/installation_wizard.html
     ocpath='/srv/http'
@@ -112,12 +113,7 @@ fi
     echo '### configuring apache ###'
     sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/httpd/conf/httpd.conf 
     sed -i 's/ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/httpd.conf 
-
-    echo "### running occ installer ###"
-    su http -s /bin/bash -c "php /srv/http/occ maintenance:install --database $DB_TYPE --database-name $DB_NAME --database-host $DB_HOST --database-user $DB_USER --database-pass $DB_PASS --admin-user $OC_ADMIN --admin-pass $OC_ADMINPASS --data-dir $OC_DATADIR"
-
-
-
+    
     if [ "$OC_BACKUP_CRON" != "no" ]; then
        echo "### set up backup cron ###"
        fcron -b -p /var/log/cron.log
