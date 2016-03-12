@@ -1,5 +1,5 @@
 #OwnCloud with Docker
-_Inspired by [l3iggs/docker-owncloud](https://github.com/l3iggs/docker-owncloud)_
+_Inspired by [lgreyltc/docker-archlinux](https://github.com/greyltc/docker-archlinux)_
 
 ### Table of Contents
  * [Features](#features)
