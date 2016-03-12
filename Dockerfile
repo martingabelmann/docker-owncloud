@@ -1,4 +1,4 @@
-FROM l3iggs/archlinux
+FROM greyltc/archlinux
 MAINTAINER martin@gabelmann.biz
 
 ENV DB_TYPE=pgsql \
