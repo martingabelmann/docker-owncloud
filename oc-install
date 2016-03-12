@@ -120,7 +120,8 @@ fi
        echo "OC_BACKUP_FILES=$OC_BACKUP_FILES
        $OC_BACKUP_CRON /usr/local/bin/backup -b 2>&1 | tee /var/log/backup.log"| fcrontab - 
     fi
-
+ 
+    rm -f /srv/http/setup-owncloud.php
 
     echo '### Gratulations! Point your browser to your new owncloud instance. ###'
 
