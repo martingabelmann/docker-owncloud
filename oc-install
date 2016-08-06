@@ -89,6 +89,9 @@ else
 
 fi
 
+    echo "### set timezone to $OC_TIME ###"
+    ln -sf /usr/share/zoneinfo/$OC_TIME /etc/localtime
+
     echo '### fixing directory premissions ###'    
     #from https://doc.owncloud.org/server/8.0/admin_manual/installation/installation_wizard.html
     ocpath='/srv/http'
