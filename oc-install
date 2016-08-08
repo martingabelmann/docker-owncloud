@@ -89,6 +89,13 @@ else
 
 fi
 
+    echo "### set timezone to $OC_TIME ###"
+    ln -sf /usr/share/zoneinfo/$OC_TIME /etc/localtime
+    
+    echo "### set locale to $LC_OC"
+    echo -e "LANG=$OC_LC\nLC_MESSAGES=$OC_LC\nLC_MONETARY=$OC_LC\nLC_NUMERIC=$OC_LC\nLC_TIME=$OC_LC" > /etc/locale.conf
+    locale-gen
+
     echo '### fixing directory premissions ###'    
     #from https://doc.owncloud.org/server/8.0/admin_manual/installation/installation_wizard.html
     ocpath='/srv/http'

@@ -15,7 +15,9 @@ ENV DB_TYPE=pgsql \
     OC_DOMAIN="localhost" \
     OC_BACKUP_CRON=no \
     OC_BACKUP_FILES=1 \
-    OC_BACKUP_DIR=/srv/http/data/backups
+    OC_BACKUP_DIR=/srv/http/data/backups \
+    OC_TIME="Europe/Berlin" \
+    OC_LC="en_US.UTF-8"
     
 RUN pacman -Syyu --noconfirm &&\
     pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql php-apcu-bc fcron --noconfirm --needed

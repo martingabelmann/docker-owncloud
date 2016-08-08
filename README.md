@@ -9,7 +9,7 @@ _Inspired by [lgreyltc/docker-archlinux](https://github.com/greyltc/docker-archl
    * [Automatic](#automatic)
    * [Restore](#restore) 
  * [Testing](#testing)
- * [OwnCloud cli](#OwnCloud_cli)
+ * [OwnCloud cli](#owncloud-cli)
 
 ####Features
  - Full owncloud instance
