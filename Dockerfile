@@ -29,7 +29,7 @@ VOLUME ["/ssl/", "/srv/http/", "/srv/http/data/"]
 ADD oc-install /usr/local/bin/oc-install
 ADD oc-backup /usr/local/bin/backup
 ADD occ /usr/local/bin/occ
-ADD httpd-vhosts.conf /etc/httpd/conf/extra/http-vhosts.conf
+ADD httpd-vhosts.conf /etc/httpd/conf/extra/httpd-vhosts.conf
 ADD server.key /ssl/server.key
 ADD server.crt /ssl/server.crt
 
