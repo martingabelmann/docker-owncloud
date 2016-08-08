@@ -112,8 +112,47 @@ fi
 
     echo '### configuring apache ###'
     sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/httpd/conf/httpd.conf 
-    sed -i 's/ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/httpd.conf 
+    sed -i 's/^#ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/httpd.conf
+    sed -i '/Listen 80/a Listen 443' /etc/httpd/conf/httpd.conf
     
+    # load extra apache modules
+    sed -i '/proxy_connect_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/proxy_ftp_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/proxy_http_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/proxy_wstunnel_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/proxy_ajp_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/proxy_balancer_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/ssl_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/cgi_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/mpm_prefork_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/rewrite_module/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/rewrite_module/a LoadModule php7_module modules\/libphp7\.so' /etc/httpd/conf/httpd.conf
+
+    # include php config
+    sed -i '/httpd-mpm/a \\n#php7\\nInclude conf\/extra/php7_module\.conf' /etc/httpd/conf/httpd.conf
+  
+    # include vhost config
+    sed -i '/httpd-vhosts/s/^#//g' /etc/httpd/conf/httpd.conf
+
+    # configure php.ini
+    sed -i 's/^;open_basedir.*$/open_basedir=\/srv\/http\/:\/tmp\/:\/dev\/urandom\//' /etc/php/php.ini
+    sed -i '/extension=bz2/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=bz2/a extension=apcu\.so' /etc/php/php.ini
+    sed -i '/extension=apcu/a extension=apc\.so' /etc/php/php.ini
+    sed -i '/extension=apc\.so/a apc\.enabled=1' /etc/php/php.ini
+    sed -i '/apc\.enabled=1/a apc\.shm_size=64M' /etc/php/php.ini
+    sed -i '/apc\.shm_size=64M/a apc\.ttl=7200' /etc/php/php.ini
+    sed -i '/apc\.ttl=7200/a apc\.enable_cli=1' /etc/php/php.ini
+    sed -i '/extension=gd/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=gettext/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=iconv/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=intl/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=mcrypt/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=pdo_pgsql/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=psql/s/^;//g' /etc/php/php.ini
+    sed -i '/extension=xmlrpc/s/^;//g' /etc/php/php.ini
+
+
     if [ "$OC_BACKUP_CRON" != "no" ]; then
        echo "### set up backup cron ###"
        fcron -b -p /var/log/cron.log
