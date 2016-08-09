@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# exit if a command fails
+set -e 
+set -o pipefail
 
 ##function definitions
 function start_psql {
