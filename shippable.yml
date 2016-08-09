@@ -1,0 +1,8 @@
+build:
+  pre_ci:
+    - docker build --no-cache -t test/owncloud:latest .
+    - docker rm -f oc || true
+    - docker run -d --name=oc test/owncloud:latest
+  ci:
+    - docker exec -ti oc "occ maintenance:install --database pgsql --database-name owncloud_db --database-user owncloud --database-pass changemepls --admin-user admin --admin-pass changemepls"
+    - docker exec -ti oc occ status
