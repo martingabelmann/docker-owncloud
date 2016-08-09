@@ -1,6 +1,9 @@
 #OwnCloud with Docker
 _Inspired by [lgreyltc/docker-archlinux](https://github.com/greyltc/docker-archlinux)_
 
+[![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=master)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
+[![](https://imagelayers.io/badge/martingabelmann/owncloud:latest.svg)](https://imagelayers.io/?images=martingabelmann/owncloud:latest 'Get your own badge on imagelayers.io')
+
 ### Table of Contents
  * [Features](#features)
  * [Basic Usage](#basics)
