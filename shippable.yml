@@ -4,5 +4,5 @@ build:
     - docker rm -f oc || true
     - docker run -d --name=oc test/owncloud:latest
   ci:
-    - docker exec -ti oc "occ maintenance:install --database pgsql --database-name owncloud_db --database-user owncloud --database-pass changemepls --admin-user admin --admin-pass changemepls"
-    - docker exec -ti oc occ status
+    - docker exec -ti oc "occ --no-ansi maintenance:install --database pgsql --database-name owncloud_db --database-user owncloud --database-pass changemepls --admin-user admin --admin-pass changemepls"
+    - docker exec -ti oc "occ --no-ansi status"
