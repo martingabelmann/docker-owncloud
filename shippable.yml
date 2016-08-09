@@ -1,6 +1,6 @@
 build:
   pre_ci:
-    - docker build --no-cache -t test/owncloud:latest .
+    - docker build -t test/owncloud:latest .
     - docker rm -f oc || true
     - docker run -d --name=oc test/owncloud:latest
   ci:
