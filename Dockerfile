@@ -20,7 +20,8 @@ ENV DB_TYPE=pgsql \
     OC_LC="en_US.UTF-8"
     
 RUN pacman -Syyu --noconfirm &&\
-    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql php-apcu-bc fcron --noconfirm --needed
+    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql php-apcu-bc fcron --noconfirm --needed &&\
+    pacman -Sc --noconfirm
 
 RUN /usr/bin/install -g http -m 775  -d /run/httpd
 RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
