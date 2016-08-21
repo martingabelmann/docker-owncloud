@@ -41,13 +41,14 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -e DB_PASS=changemepls -e OC_ADMINPASS=changemepls \
   -e OC_DOMAIN=example.org -e OC_EMAIL=admin@example.org \
   -v /srv/docker/owncloud/data/:/srv/http/data/ \
+  -v /srv/docker/owncloud/config/:/srv/http/config/ \
+  -v /srv/docker/owncloud/apps/:/srv/http/apps2/ \
   -v /srv/docker/owncloud/sql/:/var/lib/postgres/data/ \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
 ```
 
-This will mount and use the certificates. Your data is stored on your host at ``/srv/docker/owncloud/data/`` and the postgres database at ``/srv/docker/owncloud/sql``. 
+This will mount and use the certificates. Your {data,config,additional apps} are stored on your host at ``/srv/docker/owncloud/{data,config,apps}`` and the postgres database at ``/srv/docker/owncloud/sql``. 
 
-OwnClouds config- and app-directories are also placed into ``/srv/docker/owncloud/data/`` (and linked onto the right place in the container).
 
 The first run will take a while because the recent owncloud-version will be downloaded and exctracted. 
 
@@ -84,6 +85,8 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -e OC_BACKUP_FILES=2 \
   -e OC_BACKUP_CRON='@midnight' \
   -v /srv/docker/owncloud/data/:/srv/http/data/ \
+  -v /srv/docker/owncloud/config/:/srv/http/config/ \
+  -v /srv/docker/owncloud/apps/:/srv/http/apps2/ \
   -v /srv/docker/owncloud/sql/:/var/lib/postgres/data/ \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
 ```
