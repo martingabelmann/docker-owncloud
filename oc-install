@@ -37,7 +37,8 @@ fi
    
 if [ ! -e /srv/http/index.php ]; then
     
-    echo '### no owncloud webfiles found ###'  
+    echo '### no owncloud webfiles found ###'
+    mkdir -p /srv/http/data /srv/http/apps2 
     echo '### downloading owncloud webinstaller ###'
     curl https://download.owncloud.com/download/community/setup-owncloud.php > /srv/http/setup-owncloud.php
    
@@ -46,28 +47,33 @@ if [ ! -e /srv/http/index.php ]; then
     echo ""| php -R 'include("/srv/http/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
 fi
 
-if [ ! -e /srv/http/data/config/config.php ]; then
+if [ ! -e /srv/http/config/config.php ]; then
     
-    echo '### no owncloud config-files found ###'
-    mkdir -p data
-    mv -f config data/
-    mv -f apps data/
-    ln -s data/config config
-    ln -s data/apps apps
-
     echo '### writing config-files ###'
-    #enable memcache
+    #enable memcache and set additional apps dir
     #notice: here-documents only support real tabs
-	cat <<-EOF >/srv/http/data/config/config.php
+	cat <<-EOF >/srv/http/config/config.php
 		<?php
 		\$CONFIG = array (
 			'memcache.local' => '\\OC\\Memcache\\APCu',
+			'apps_paths' => array (
+				0 => array (
+					"path"     => "/srv/http/apps",
+					"url"      => "/apps",
+					"writable" => false,
+				),
+				1 => array (
+					"path"     => "/srv/http/apps2",
+					"url"      => "/apps2",
+					"writable" => true,
+				)
+			)
 		);
 	EOF
 
     #write autoconfig
     #notice: here-documents only support real tabs
-	cat <<-EOF >/srv/http/data/config/autoconfig.php
+	cat <<-EOF >/srv/http/config/autoconfig.php
 		<?php
 		\$AUTOCONFIG = array (
 		"dbtype"        => "$DB_TYPE",
@@ -81,15 +87,6 @@ if [ ! -e /srv/http/data/config/config.php ]; then
 		"directory"     => "$OC_DATADIR",
 		);
 	EOF
-
-else
-   
-   echo '### existing config-files found, migrating... ###' 
-   rm -rf /srv/http/config
-   rm -rf /srv/http/apps
-   ln -s data/config config
-   ln -s data/apps apps
-
 fi
 
     echo "### set timezone to $OC_TIME ###"
@@ -107,13 +104,13 @@ fi
 
     find ${ocpath}/ -type f -print0 | xargs -0 chmod 0640
     find ${ocpath}/ -type d -print0 | xargs -0 chmod 0750
-    
+   
     chown -R root:${htuser} ${ocpath}/
     chown -R ${htuser}:${htgroup} ${ocpath}/apps/
     chown -R ${htuser}:${htgroup} ${ocpath}/config/
     chown -R ${htuser}:${htgroup} ${OC_DATADIR}
     chown -R ${htuser}:${htgroup} ${ocpath}/themes/
-   
+
     chown -R root:root /ssl/
     chmod 600 /ssl
     chmod -R 700  /ssl/

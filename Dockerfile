@@ -15,7 +15,7 @@ ENV DB_TYPE=pgsql \
     OC_DOMAIN="localhost" \
     OC_BACKUP_CRON=no \
     OC_BACKUP_FILES=1 \
-    OC_BACKUP_DIR=/srv/http/data/backups \
+    OC_BACKUP_DIR=/backup \
     OC_TIME="Europe/Berlin" \
     OC_LC="en_US.UTF-8"
     
@@ -27,7 +27,7 @@ RUN /usr/bin/install -g http -m 775  -d /run/httpd
 RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
 RUN /usr/bin/install -o postgres -d /var/log/postgres
 
-VOLUME ["/ssl/", "/srv/http/", "/srv/http/data/"]
+VOLUME ["/ssl", "/backup", "/srv/http"]
 
 ADD oc-install /usr/local/bin/oc-install
 ADD oc-backup /usr/local/bin/backup
@@ -43,4 +43,4 @@ EXPOSE 433
 WORKDIR /srv/http/
 
 ENTRYPOINT ["oc-install"]
-CMD ["/usr/bin/apachectl", "start",  "-DFOREGROUND"]
+CMD ["/usr/bin/apachectl", "start",  "-DFOREGROUND"] 
