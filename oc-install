@@ -97,25 +97,8 @@ fi
     locale-gen
 
     echo '### fixing directory premissions ###'    
-    #from https://doc.owncloud.org/server/8.0/admin_manual/installation/installation_wizard.html
-    ocpath='/srv/http'
-    htuser='http'
-    htgroup='http'
-
-    find ${ocpath}/ -type f -print0 | xargs -0 chmod 0640
-    find ${ocpath}/ -type d -print0 | xargs -0 chmod 0750
-   
-    chown -R root:${htuser} ${ocpath}/
-    chown -R ${htuser}:${htgroup} ${ocpath}/apps/
-    chown -R ${htuser}:${htgroup} ${ocpath}/config/
-    chown -R ${htuser}:${htgroup} ${OC_DATADIR}
-    chown -R ${htuser}:${htgroup} ${ocpath}/themes/
-
-    chown -R root:root /ssl/
-    chmod 600 /ssl
-    chmod -R 700  /ssl/
-   
-    chmod +x /srv/http/occ
+    #from https://wiki.archlinux.org/index.php/OwnCloud
+    /usr/local/bin/oc-perms
 
     echo '### configuring apache ###'
     sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/httpd/conf/httpd.conf 

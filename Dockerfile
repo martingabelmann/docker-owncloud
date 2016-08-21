@@ -30,6 +30,7 @@ RUN /usr/bin/install -o postgres -d /var/log/postgres
 VOLUME ["/ssl", "/backup", "/srv/http"]
 
 ADD oc-install /usr/local/bin/oc-install
+ADD oc-perms /usr/local/bin/oc-perms
 ADD oc-backup /usr/local/bin/backup
 ADD occ /usr/local/bin/occ
 ADD httpd-vhosts.conf /etc/httpd/conf/extra/httpd-vhosts.conf
