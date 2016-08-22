@@ -45,6 +45,7 @@ if [ ! -e /srv/http/index.php ]; then
     echo '### running owncloud webinstaller ###'
     echo '...this may take a while...'
     echo ""| php -R 'include("/srv/http/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
+    rm -f /srv/http/setup-owncloud.php
 fi
 
 if [ ! -e /srv/http/config/config.php ]; then
@@ -89,6 +90,8 @@ if [ ! -e /srv/http/config/config.php ]; then
 	EOF
 fi
 
+
+if [ ! -e /srv/installed ]; then
     echo "### set timezone to $OC_TIME ###"
     ln -sf /usr/share/zoneinfo/$OC_TIME /etc/localtime
     
@@ -155,8 +158,10 @@ fi
        $OC_BACKUP_CRON /usr/local/bin/backup -b 2>&1 | tee /var/log/backup.log"| fcrontab - 
     fi
  
-    rm -f /srv/http/setup-owncloud.php
 
     echo '### Gratulations! Point your browser to your new owncloud instance. ###'
+    touch /srv/installed
+fi
 
+rm -f /run/httpd/httpd.pid
 exec $@
