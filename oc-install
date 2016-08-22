@@ -108,6 +108,7 @@ if [ ! -e /srv/installed ]; then
     sed -i 's/^#ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/httpd.conf
     sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/httpd/conf/extra/httpd-vhosts.conf 
     sed -i 's/ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/extra/httpd-vhosts.conf
+    sed -i 's/Redirect permanent.*$/Redirect permanent \/ https:\/\/'"$OC_DOMAIN"'\//g' /etc/httpd/conf/extra/httpd-vhosts.conf
     sed -i '/Listen 80/a Listen 443' /etc/httpd/conf/httpd.conf
     
     # load extra apache modules
