@@ -1,4 +1,4 @@
-FROM greyltc/archlinux
+FROM alpine
 MAINTAINER martin@gabelmann.biz
 
 ENV DB_TYPE=pgsql \
@@ -10,7 +10,8 @@ ENV DB_TYPE=pgsql \
     DB_EXTERNAL=false \
     OC_ADMIN=admin \
     OC_ADMINPASS=changemepls \
-    OC_DATADIR=/srv/http/data \
+    OC_WWW=/var/www/localhost/htdocs \
+    OC_DATADIR=/var/www/localhost/htdocs/data \
     OC_EMAIL="admin@localhost" \
     OC_DOMAIN="localhost" \
     OC_BACKUP_CRON=no \
@@ -19,21 +20,18 @@ ENV DB_TYPE=pgsql \
     OC_TIME="Europe/Berlin" \
     OC_LC="en_US.UTF-8"
     
-RUN pacman -Syyu --noconfirm &&\
-    pacman -S vim apache php php-apache php-mcrypt php-intl php-gd php-pgsql postgresql php-apcu-bc fcron --noconfirm --needed &&\
-    pacman -Sc --noconfirm
+RUN apk upate && apk upgrade &&\
+    apk add apache2 php5 php5-apache2 php5-mcrypt php5-intl php5-gd php5-pgsql php5-pdo_pgsql php5-apcu php5-openssl postgresql
 
-RUN /usr/bin/install -g http -m 775  -d /run/httpd
-RUN /usr/bin/install -g postgres -m 775  -d /run/postgresql
-RUN /usr/bin/install -o postgres -d /var/log/postgres
+RUN /usr/bin/install -o postgres -d /var/log/postgresql
 
-VOLUME ["/ssl", "/backup", "/srv/http"]
+VOLUME ["/ssl", "/backup", "/var/www/localhost/htdocs"]
 
 ADD oc-install /usr/local/bin/oc-install
 ADD oc-perms /usr/local/bin/oc-perms
 ADD oc-backup /usr/local/bin/backup
 ADD occ /usr/local/bin/occ
-ADD httpd-vhosts.conf /etc/httpd/conf/extra/httpd-vhosts.conf
+ADD httpd-vhosts.conf /etc/apache2/conf.d/httpd-vhosts.conf
 ADD server.key /ssl/server.key
 ADD server.crt /ssl/server.crt
 
@@ -41,7 +39,7 @@ ADD server.crt /ssl/server.crt
 EXPOSE 80
 EXPOSE 433
 
-WORKDIR /srv/http/
+WORKDIR /var/www/localhost/htdocs
 
 ENTRYPOINT ["oc-install"]
-CMD ["/usr/bin/apachectl", "start",  "-DFOREGROUND"] 
+CMD ["/usr/sbin/httpd", "-kstart",  "-DFOREGROUND"] 

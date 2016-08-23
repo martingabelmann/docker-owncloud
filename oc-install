@@ -7,7 +7,7 @@ set -o pipefail
 ##function definitions
 function start_psql {
     echo '### starting database server ###'
-    su - postgres -c "pg_ctl start -D /var/lib/postgres/data -l /var/log/postgres/log"
+    su - postgres -c "pg_ctl start -D /var/lib/postgresql/data -l /var/log/postgresql/log"
 }
 
 
@@ -18,9 +18,9 @@ if [ "$DB_EXTERNAL" = false ]; then
         echo '### no local postgres database found ###'
         echo '### installing database ###'
 
-        chown postgres:postgres /var/lib/postgres/data
-        chmod u=rwx,g-rwx,o-rwx /var/lib/postgres/data
-        su - postgres -c "initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgres/data'"
+        chown postgres:postgres /var/lib/postgresql/data
+        chmod u=rwx,g-rwx,o-rwx /var/lib/postgresql/data
+        su - postgres -c "initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgresql/data'"
         start_psql
         sleep 2 #wait for postgres till started
         echo '### create Owncloud Database and -user ###'
@@ -35,36 +35,36 @@ fi
 
 
    
-if [ ! -e /srv/http/index.php ]; then
+if [ ! -e "$OC_WWW/index.php" ]; then
     
     echo '### no owncloud webfiles found ###'
-    mkdir -p /srv/http/data /srv/http/apps2 
+    mkdir -p "$OC_WWW/data" "$OC_WWW/apps2" 
     echo '### downloading owncloud webinstaller ###'
-    curl https://download.owncloud.com/download/community/setup-owncloud.php > /srv/http/setup-owncloud.php
+    curl https://download.owncloud.com/download/community/setup-owncloud.php > "$OC_WWW/setup-owncloud.php"
    
     echo '### running owncloud webinstaller ###'
     echo '...this may take a while...'
-    echo ""| php -R 'include("/srv/http/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
-    rm -f /srv/http/setup-owncloud.php
+    echo ""| php -R 'include("'$OC_WWW'/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
+    rm -f "$OC_WWW"/setup-owncloud.php
 fi
 
-if [ ! -e /srv/http/config/config.php ]; then
+if [ ! -e "$OC_WWW/config/config.php" ]; then
     
     echo '### writing config-files ###'
     #enable memcache and set additional apps dir
     #notice: here-documents only support real tabs
-	cat <<-EOF >/srv/http/config/config.php
+	cat <<-EOF >"$OC_WWW/config/config.php"
 		<?php
 		\$CONFIG = array (
 			'memcache.local' => '\\OC\\Memcache\\APCu',
 			'apps_paths' => array (
 				0 => array (
-					"path"     => "/srv/http/apps",
+					"path"     => "$OC_WWW/apps",
 					"url"      => "/apps",
 					"writable" => false,
 				),
 				1 => array (
-					"path"     => "/srv/http/apps2",
+					"path"     => "$OC_WWW/apps2",
 					"url"      => "/apps2",
 					"writable" => true,
 				)
@@ -74,7 +74,7 @@ if [ ! -e /srv/http/config/config.php ]; then
 
     #write autoconfig
     #notice: here-documents only support real tabs
-	cat <<-EOF >/srv/http/config/autoconfig.php
+	cat <<-EOF >"$OC_WWW/config/autoconfig.php"
 		<?php
 		\$AUTOCONFIG = array (
 		"dbtype"        => "$DB_TYPE",
@@ -104,59 +104,59 @@ if [ ! -e /srv/installed ]; then
     /usr/local/bin/oc-perms
 
     echo '### configuring apache ###'
-    sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/httpd/conf/httpd.conf 
-    sed -i 's/^#ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/httpd.conf
-    sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/httpd/conf/extra/httpd-vhosts.conf 
-    sed -i 's/ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/httpd/conf/extra/httpd-vhosts.conf
-    sed -i 's/Redirect permanent.*$/Redirect permanent \/ https:\/\/'"$OC_DOMAIN"'\//g' /etc/httpd/conf/extra/httpd-vhosts.conf
-    sed -i '/Listen 80/a Listen 443' /etc/httpd/conf/httpd.conf
+    sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/apache2/httpd.conf 
+    sed -i 's/^#ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/apache2/httpd.conf
+    sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/apache2/conf.d/httpd-vhosts.conf 
+    sed -i 's/ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/apache2/conf.d/httpd-vhosts.conf
+    sed -i 's/Redirect permanent.*$/Redirect permanent \/ https:\/\/'"$OC_DOMAIN"'\//g' /etc/apache2/conf.d/httpd-vhosts.conf
+    sed -i '/Listen 80/a Listen 443' /etc/apache2/httpd.conf
     
     # load extra apache modules
-    sed -i '/proxy_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/proxy_connect_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/proxy_ftp_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/proxy_http_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/proxy_wstunnel_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/proxy_ajp_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/proxy_balancer_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/ssl_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/cgi_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/socache_shmcb_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/mpm_prefork_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/mpm_event_module/s/^/#/g' /etc/httpd/conf/httpd.conf
-    sed -i '/rewrite_module/s/^#//g' /etc/httpd/conf/httpd.conf
-    sed -i '/rewrite_module/a LoadModule php7_module modules\/libphp7\.so' /etc/httpd/conf/httpd.conf
+    sed -i '/proxy_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/proxy_connect_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/proxy_ftp_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/proxy_http_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/proxy_wstunnel_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/proxy_ajp_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/proxy_balancer_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/ssl_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/cgi_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/socache_shmcb_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/mpm_prefork_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/mpm_event_module/s/^/#/g' /etc/apache2/httpd.conf
+    sed -i '/rewrite_module/s/^#//g' /etc/apache2/httpd.conf
+    sed -i '/rewrite_module/a LoadModule php7_module modules\/libphp7\.so' /etc/apache2/httpd.conf
 
     # include php config
-    sed -i '/httpd-mpm/a Include conf\/extra/php7_module\.conf' /etc/httpd/conf/httpd.conf
+    sed -i '/httpd-mpm/a Include conf\/extra/php7_module\.conf' /etc/apache2/httpd.conf
   
     # include vhost config
-    sed -i '/httpd-vhosts/s/^#//g' /etc/httpd/conf/httpd.conf
+    sed -i '/httpd-vhosts/s/^#//g' /etc/apache2/httpd.conf
 
     # configure php.ini
-    sed -i 's/^;open_basedir.*$/open_basedir=\/srv\/http\/:\/tmp\/:\/dev\/urandom/' /etc/php/php.ini
-    sed -i '/extension=bz2/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=bz2/a extension=apcu\.so' /etc/php/php.ini
-    sed -i '/extension=apcu/a extension=apc\.so' /etc/php/php.ini
-    sed -i '/extension=apc\.so/a apc\.enabled=1' /etc/php/php.ini
-    sed -i '/apc\.enabled=1/a apc\.shm_size=64M' /etc/php/php.ini
-    sed -i '/apc\.shm_size=64M/a apc\.ttl=7200' /etc/php/php.ini
-    sed -i '/apc\.ttl=7200/a apc\.enable_cli=1' /etc/php/php.ini
-    sed -i '/extension=gd/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=gettext/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=iconv/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=intl/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=mcrypt/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=pdo_pgsql/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=pgsql/s/^;//g' /etc/php/php.ini
-    sed -i '/extension=xmlrpc/s/^;//g' /etc/php/php.ini
+    sed -i 's/^;open_basedir.*$/open_basedir=\/srv\/http\/:\/tmp\/:\/dev\/urandom/' /etc/php5/php.ini
+    sed -i '/extension=bz2/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=bz2/a extension=apcu\.so' /etc/php5/php.ini
+    sed -i '/extension=apcu/a extension=apc\.so' /etc/php5/php.ini
+    sed -i '/extension=apc\.so/a apc\.enabled=1' /etc/php5/php.ini
+    sed -i '/apc\.enabled=1/a apc\.shm_size=64M' /etc/php5/php.ini
+    sed -i '/apc\.shm_size=64M/a apc\.ttl=7200' /etc/php5/php.ini
+    sed -i '/apc\.ttl=7200/a apc\.enable_cli=1' /etc/php5/php.ini
+    sed -i '/extension=gd/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=gettext/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=iconv/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=intl/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=mcrypt/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=pdo_pgsql/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=pgsql/s/^;//g' /etc/php5/php.ini
+    sed -i '/extension=xmlrpc/s/^;//g' /etc/php5/php.ini
 
 
     if [ "$OC_BACKUP_CRON" != "no" ]; then
        echo "### set up backup cron ###"
-       fcron -b -p /var/log/cron.log
        echo "OC_BACKUP_FILES=$OC_BACKUP_FILES
-       $OC_BACKUP_CRON /usr/local/bin/backup -b 2>&1 | tee /var/log/backup.log"| fcrontab - 
+       $OC_BACKUP_CRON /usr/local/bin/backup -b 2>&1 | tee /var/log/backup.log" > /var/spool/cron/crontabs/root
+       crond -b -L /var/log/cron.log
     fi
  
 
@@ -164,5 +164,4 @@ if [ ! -e /srv/installed ]; then
     touch /srv/installed
 fi
 
-rm -f /run/httpd/httpd.pid
 exec $@
