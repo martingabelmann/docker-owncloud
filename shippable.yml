@@ -5,6 +5,7 @@ build:
     - docker run -d --name=oc test/owncloud:latest
   ci:
     - sleep 30
+    - if [ ! -n "$(docker logs --tail=5 oc|grep 'Gratulations')" ]; then sleep 30; fi
     - docker logs oc
     - docker exec oc occ "--no-ansi maintenance:install --database pgsql --database-name owncloud_db --database-user owncloud --database-pass changemepls --admin-user admin --admin-pass changemepls"
     - sleep 3
