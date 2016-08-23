@@ -24,7 +24,7 @@ RUN apk update && apk upgrade &&\
     apk add tzdata openssl ca-certificates apache2 apache2-ssl php5 php5-apache2 \
     php5-mcrypt php5-intl php5-gd php5-pgsql php5-pdo_pgsql php5-apcu php5-openssl \
     php5-curl php5-zip php5-json php5-dom php5-xmlreader php5-ctype php5-zlib \
-    php5-iconv php5-xml php5-xmlrpc php5-posix postgresql
+    php5-iconv php5-xml php5-xmlrpc php5-posix php5-pcntl postgresql
 
 RUN /usr/bin/install -g apache -m 775  -d /run/apache2
 RUN /usr/bin/install -o postgres -d /var/log/postgresql
