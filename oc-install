@@ -127,7 +127,7 @@ if [ ! -e /srv/installed ]; then
     sed -i '/rewrite_module/s/^#//g' /etc/apache2/httpd.conf
 
     # configure php.ini
-    sed -i 's/^;open_basedir.*$/open_basedir=\/srv\/http\/:\/tmp\/:\/dev\/urandom/' /etc/php5/php.ini
+    sed -i 's/^;open_basedir.*$/open_basedir=\/var\/www\/localhost\/htdocs:\/tmp\/:\/dev\/urandom/' /etc/php5/php.ini
     sed -i '/extension=bz2/s/^;//g' /etc/php5/php.ini
     sed -i '/extension=bz2/a extension=apcu\.so' /etc/php5/php.ini
     sed -i '/extension=apcu/a extension=apc\.so' /etc/php5/php.ini
