@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
 # exit if a command fails
 set -e 
 set -o pipefail
 
 ##function definitions
-function start_psql {
+start_psql() {
     echo '### starting database server ###'
     su - postgres -c "pg_ctl start -D /var/lib/postgresql/data -l /var/log/postgresql/log"
 }
@@ -40,7 +40,7 @@ if [ ! -e "$OC_WWW/index.php" ]; then
     echo '### no owncloud webfiles found ###'
     mkdir -p "$OC_WWW/data" "$OC_WWW/apps2" 
     echo '### downloading owncloud webinstaller ###'
-    curl https://download.owncloud.com/download/community/setup-owncloud.php > "$OC_WWW/setup-owncloud.php"
+    wget https://download.owncloud.com/download/community/setup-owncloud.php -O "$OC_WWW/setup-owncloud.php"
    
     echo '### running owncloud webinstaller ###'
     echo '...this may take a while...'
@@ -94,10 +94,11 @@ fi
 if [ ! -e /srv/installed ]; then
     echo "### set timezone to $OC_TIME ###"
     ln -sf /usr/share/zoneinfo/$OC_TIME /etc/localtime
-    
-    echo "### set locale to $LC_OC"
-    echo -e "LANG=$OC_LC\nLC_MESSAGES=$OC_LC\nLC_MONETARY=$OC_LC\nLC_NUMERIC=$OC_LC\nLC_TIME=$OC_LC" > /etc/locale.conf
-    locale-gen
+   
+    # not supported in alpine 
+    #echo "### set locale to $LC_OC"
+    #echo -e "LANG=$OC_LC\nLC_MESSAGES=$OC_LC\nLC_MONETARY=$OC_LC\nLC_NUMERIC=$OC_LC\nLC_TIME=$OC_LC" > /etc/locale.conf
+    #locale-gen
 
     echo '### fixing directory premissions ###'    
     #from https://wiki.archlinux.org/index.php/OwnCloud
@@ -121,17 +122,9 @@ if [ ! -e /srv/installed ]; then
     sed -i '/proxy_balancer_module/s/^#//g' /etc/apache2/httpd.conf
     sed -i '/ssl_module/s/^#//g' /etc/apache2/httpd.conf
     sed -i '/cgi_module/s/^#//g' /etc/apache2/httpd.conf
-    sed -i '/socache_shmcb_module/s/^#//g' /etc/apache2/httpd.conf
     sed -i '/mpm_prefork_module/s/^#//g' /etc/apache2/httpd.conf
     sed -i '/mpm_event_module/s/^/#/g' /etc/apache2/httpd.conf
     sed -i '/rewrite_module/s/^#//g' /etc/apache2/httpd.conf
-    sed -i '/rewrite_module/a LoadModule php7_module modules\/libphp7\.so' /etc/apache2/httpd.conf
-
-    # include php config
-    sed -i '/httpd-mpm/a Include conf\/extra/php7_module\.conf' /etc/apache2/httpd.conf
-  
-    # include vhost config
-    sed -i '/httpd-vhosts/s/^#//g' /etc/apache2/httpd.conf
 
     # configure php.ini
     sed -i 's/^;open_basedir.*$/open_basedir=\/srv\/http\/:\/tmp\/:\/dev\/urandom/' /etc/php5/php.ini
@@ -142,13 +135,8 @@ if [ ! -e /srv/installed ]; then
     sed -i '/apc\.enabled=1/a apc\.shm_size=64M' /etc/php5/php.ini
     sed -i '/apc\.shm_size=64M/a apc\.ttl=7200' /etc/php5/php.ini
     sed -i '/apc\.ttl=7200/a apc\.enable_cli=1' /etc/php5/php.ini
-    sed -i '/extension=gd/s/^;//g' /etc/php5/php.ini
     sed -i '/extension=gettext/s/^;//g' /etc/php5/php.ini
     sed -i '/extension=iconv/s/^;//g' /etc/php5/php.ini
-    sed -i '/extension=intl/s/^;//g' /etc/php5/php.ini
-    sed -i '/extension=mcrypt/s/^;//g' /etc/php5/php.ini
-    sed -i '/extension=pdo_pgsql/s/^;//g' /etc/php5/php.ini
-    sed -i '/extension=pgsql/s/^;//g' /etc/php5/php.ini
     sed -i '/extension=xmlrpc/s/^;//g' /etc/php5/php.ini
 
 

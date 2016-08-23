@@ -1,5 +1,5 @@
 #OwnCloud with Docker
-_Inspired by [lgreyltc/docker-archlinux](https://github.com/greyltc/docker-archlinux)_
+_Based on Alpine_
 
 [![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=master)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
 [![](https://imagelayers.io/badge/martingabelmann/owncloud:latest.svg)](https://imagelayers.io/?images=martingabelmann/owncloud:owncloud9 'Get your own badge on imagelayers.io')
@@ -40,10 +40,10 @@ choose a good database- and adminpassword, then type:
 docker run --name=oc -d -p 443:443 -p 80:80 \
   -e DB_PASS=changemepls -e OC_ADMINPASS=changemepls \
   -e OC_DOMAIN=example.org -e OC_EMAIL=admin@example.org \
-  -v /srv/docker/owncloud/data/:/srv/http/data/ \
-  -v /srv/docker/owncloud/config/:/srv/http/config/ \
-  -v /srv/docker/owncloud/apps/:/srv/http/apps2/ \
-  -v /srv/docker/owncloud/sql/:/var/lib/postgres/data/ \
+  -v /srv/docker/owncloud/data/:/var/www/localhost/htdocs/data/ \
+  -v /srv/docker/owncloud/config/:/var/www/localhost/htdocs/config/ \
+  -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
+  -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
 ```
 
@@ -84,10 +84,10 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -e OC_DOMAIN=example.org -e OC_EMAIL=admin@example.org \
   -e OC_BACKUP_FILES=2 \
   -e OC_BACKUP_CRON='@midnight' \
-  -v /srv/docker/owncloud/data/:/srv/http/data/ \
-  -v /srv/docker/owncloud/config/:/srv/http/config/ \
-  -v /srv/docker/owncloud/apps/:/srv/http/apps2/ \
-  -v /srv/docker/owncloud/sql/:/var/lib/postgres/data/ \
+  -v /srv/docker/owncloud/data/:/var/www/localhost/htdocs/data/ \
+  -v /srv/docker/owncloud/config/:/var/www/localhost/htdocs/config/ \
+  -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
+  -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
 ```
  
@@ -131,7 +131,7 @@ Sometimes it happens that a upgrade fails and breaks your OwnCloud webinterface 
 ```
 docker exec oc occ app:disable APPNAME
 ```
-you may ask which apps are broken. Find out by observing `/srv/http/data/owncloud.log``. Check a specific app with
+you may ask which apps are broken. Find out by observing `/var/www/localhost/htdocs/data/owncloud.log``. Check a specific app with
 
 ```
 docker exec oc app:check APPNAME

@@ -20,10 +20,15 @@ ENV DB_TYPE=pgsql \
     OC_TIME="Europe/Berlin" \
     OC_LC="en_US.UTF-8"
     
-RUN apk upate && apk upgrade &&\
-    apk add apache2 php5 php5-apache2 php5-mcrypt php5-intl php5-gd php5-pgsql php5-pdo_pgsql php5-apcu php5-openssl postgresql
+RUN apk update && apk upgrade &&\
+    apk add tzdata openssl ca-certificates apache2 apache2-ssl php5 php5-apache2 \
+    php5-mcrypt php5-intl php5-gd php5-pgsql php5-pdo_pgsql php5-apcu php5-openssl \
+    php5-curl php5-zip php5-json php5-dom php5-xmlreader php5-ctype php5-zlib \
+    php5-iconv php5-xml php5-xmlrpc postgresql
 
+RUN /usr/bin/install -g apache -m 775  -d /run/apache2
 RUN /usr/bin/install -o postgres -d /var/log/postgresql
+RUN /usr/bin/install -o postgres -d /var/lib/postgresql/data
 
 VOLUME ["/ssl", "/backup", "/var/www/localhost/htdocs"]
 
