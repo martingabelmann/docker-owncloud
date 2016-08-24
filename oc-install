@@ -13,7 +13,7 @@ start_psql() {
 
 if [ "$DB_EXTERNAL" = false ]; then
 
-    if [ ! -d /var/lib/postgres/data/base ]; then
+    if [ ! -d /var/lib/postgresql/data/base ]; then
 
         echo '### no local postgres database found ###'
         echo '### installing database ###'
