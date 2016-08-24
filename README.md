@@ -44,7 +44,7 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -v /srv/docker/owncloud/config/:/var/www/localhost/htdocs/config/ \
   -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
   -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
-  -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
+  -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud:alpine
 ```
 
 This will mount and use the certificates. Your {data,config,additional apps} are stored on your host at ``/srv/docker/owncloud/{data,config,apps}`` and the postgres database at ``/srv/docker/owncloud/sql``. 
