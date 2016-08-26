@@ -33,10 +33,7 @@ ENV DB_TYPE=pgsql \
     OC_MAIL_SMTPPORT=465 \
     OC_MAIL_SMTPNAME=admin@localhost \
     OC_MAIL_SMTPSECURE=ssl \
-    OC_MAIL_SMTPPASSWORD=changemepls \
-    OC_INSTALLED=false \
-    OC_VERSION='9.1.0.15'
-
+    OC_MAIL_SMTPPASSWORD=changemepls 
     
 RUN apk update && apk upgrade &&\
     apk add tzdata openssl ca-certificates apache2 apache2-ssl php5 php5-apache2 \
