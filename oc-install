@@ -49,47 +49,23 @@ if [ ! -e "$OC_WWW/index.php" ]; then
     rm -f "$OC_WWW"/setup-owncloud.php
 fi
 
-if [ ! -e "$OC_WWW/config/config.php" ]; then
-    
-    echo '### writing config-files ###'
-    #enable memcache and set additional apps dir
-    #notice: here-documents only support real tabs
-	cat <<-EOF >"$OC_WWW/config/config.php"
-		<?php
-		\$CONFIG = array (
-			'memcache.local' => '\\OC\\Memcache\\APCu',
-			'apps_paths' => array (
-				0 => array (
-					"path"     => "$OC_WWW/apps",
-					"url"      => "/apps",
-					"writable" => false,
-				),
-				1 => array (
-					"path"     => "$OC_WWW/apps2",
-					"url"      => "/apps2",
-					"writable" => true,
-				)
-			)
-		);
-	EOF
 
-    #write autoconfig
-    #notice: here-documents only support real tabs
-	cat <<-EOF >"$OC_WWW/config/autoconfig.php"
-		<?php
-		\$AUTOCONFIG = array (
-		"dbtype"        => "$DB_TYPE",
-		"dbname"        => "$DB_NAME",
-		"dbuser"        => "$DB_USER",
-		"dbpass"        => "$DB_PASS",
-		"dbhost"        => "$DB_HOST",
-		"dbtableprefix" => "$DB_PREFIX",
-		"adminlogin"    => "$OC_ADMIN",
-		"adminpass"     => "$OC_ADMINPASS",
-		"directory"     => "$OC_DATADIR",
-		);
-	EOF
-fi
+echo '### copying templates from /tpl ###'
+
+# usethis variable to write he dollar e.g.: 
+#    $config = $bash_var; 
+# goes to  
+#    ${D}config = $bash_var;
+# where config is a php variable set to the content of the bash variable "$bash_var"
+export D='$'
+
+for tpl in $(find /tpl -type f); do 
+    destination=${tpl#/tpl}
+    echo "$tpl >> $destination"
+    mkdir -p "${destination%/*}"
+    echo "$(envsubst < $tpl)" > "$destination"
+done
+
 
 
 if [ ! -e /srv/installed ]; then
@@ -108,9 +84,6 @@ if [ ! -e /srv/installed ]; then
     echo '### configuring apache ###'
     sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/apache2/httpd.conf 
     sed -i 's/^#ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/apache2/httpd.conf
-    sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/apache2/conf.d/httpd-vhosts.conf 
-    sed -i 's/ServerName.*$/ServerName '"$OC_DOMAIN"'/g' /etc/apache2/conf.d/httpd-vhosts.conf
-    sed -i 's/Redirect permanent.*$/Redirect permanent \/ https:\/\/'"$OC_DOMAIN"'\//g' /etc/apache2/conf.d/httpd-vhosts.conf
 
     if [ "$OC_BACKUP_CRON" != "no" ]; then
        echo "### set up backup cron ###"

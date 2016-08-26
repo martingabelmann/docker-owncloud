@@ -1,4 +1,4 @@
-#OwnCloud with Docker
+# OwnCloud with Docker
 _Based on Alpine_
 
 [![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=alpine)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
@@ -8,18 +8,18 @@ _Based on Alpine_
 ---
 
  * [Features](#features)
- * [Basic Usage](#basics)
+ * [Installation](#basics)
  * [Backups](#backups)
  * [Testing](#testing)
  * [OwnCloud cli](#owncloud-cli)
 
-####Features
+#### Features
  - Full owncloud instance
  - OneClick/Run installation
  - Enforced ssl encryption 
  - Backup cronjobs
 
-####Basics
+#### Installation
 Get the image:
 ```
 docker pull martingabelmann/owncloud
@@ -40,7 +40,6 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -e DB_PASS=changemepls -e OC_ADMINPASS=changemepls \
   -e OC_DOMAIN=example.org -e OC_EMAIL=admin@example.org \
   -v /srv/docker/owncloud/data/:/var/www/localhost/htdocs/data/ \
-  -v /srv/docker/owncloud/config/:/var/www/localhost/htdocs/config/ \
   -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
   -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud:alpine
@@ -53,11 +52,20 @@ The first run will take a while because the recent owncloud-version will be down
 
 Check ``docker logs oc`` to verify that everything is done. Then point your browser to ``https://example.org/``. On the first vistit/install Owncloud will do some configurations and directly login into to the admin panel.
 
+##### Persistent configs
+**All** files locatet at ``/tpl`` are copied to the filesystems root ``/`` relative to ``/tpl/``. 
+For instance the preexisting file ``/tpl/var/www/localhost/htdocs/config/config.php`` is copied to ``/var/www/localhost/htdocs/config/config.php``.
+Simultaneously the installation uses the tool ``envsubst`` to replace all bash variables with variables passed with the ``-e`` option. 
+For php files this means, that you cannot simply write ``$phpvariable='"$OC_DOMAIN"';``, since the ``$phpvarvariable`` would be substituted too (with nothing if its not defined). 
+There is an exported variable ``${D}`` containing the dollar sign:  ``${D}phpvariable='"$OC_DOMAIN"';`` will lead to the desired result (e.g. ``$phpvariable='example.org';``).
 
-####Backups
+You can mount your own config into ``/tpl`` and use your own environment variables with ``-e``.
+
+
+#### Backups
 The image provides a script called ``backup`` which is used to tar the data, config, apps and sql directories into OC_BACKUP_DIR and extract existing tarfiles from there into the corresponig destinations.
 
-#####Manual
+##### Manual
  - You can either join the containers bash with a
  ```
  docker exec -ti oc bash
@@ -70,7 +78,7 @@ The image provides a script called ``backup`` which is used to tar the data, con
  - To perform a new backup run ``backup -b``. The file is placed into ``/backups`` and called like ``owncloud_yearmonthday_time.tar.gz``. Depending on the variable ``OC_BACKUP_FILES``  (default=1), old backupfiles will be deleted.
 
 
-#####Automatic
+##### Automatic
 The installscript is able to set a cronjob with that backup script. Because some people may have less storage it is disabled by default. To enable it just set the ``OC_BACKUP_CRON`` variable with the usual cron shurtcuts (see [here](http://fcron.free.fr/doc/en/fcrontab.5.html#AEN2144), e.g. to do a daily backup at midnight use 
 ``-e OC_BACKUP_CRON='@midnight'``).
  
@@ -84,14 +92,13 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -e OC_BACKUP_FILES=2 \
   -e OC_BACKUP_CRON='@midnight' \
   -v /srv/docker/owncloud/data/:/var/www/localhost/htdocs/data/ \
-  -v /srv/docker/owncloud/config/:/var/www/localhost/htdocs/config/ \
   -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
   -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
   -v /srv/docker/owncloud/backups/:/backups/ \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
 ```
  
-#####Restore
+##### Restore
  - Get a list of all available backups with ``backup -l``,
  - copy the filename of your choise (including extension),
  - restore with ``backup -r filename.tar.gz``
