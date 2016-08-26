@@ -135,7 +135,7 @@ you may ask which apps are broken. Find out by observing `/var/www/localhost/htd
 ```
 docker exec oc app:check APPNAME
 ``` 
-for compatiblity. If it fails, install the newest/compatible version by copying into `/srv/data/apps/` (e.g. pulling from github). Afterwards try to enable it
+for compatiblity. If it fails, install the newest/compatible version by copying into `/var/www/localhost/htdocs/apps2/` (e.g. pulling from github). Afterwards try to enable it
 ```
 docker exec oc app:enable APPNAME
 ```
