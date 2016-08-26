@@ -1,8 +1,9 @@
 #OwnCloud with Docker
-_Inspired by [lgreyltc/docker-archlinux](https://github.com/greyltc/docker-archlinux)_
+_Based on [lgreyltc/docker-archlinux](https://github.com/greyltc/docker-archlinux)_
 
-[![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=master)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
-[![](https://imagelayers.io/badge/martingabelmann/owncloud:latest.svg)](https://imagelayers.io/?images=martingabelmann/owncloud:owncloud9 'Get your own badge on imagelayers.io')
+[![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=archlinux)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
+[![](https://images.microbadger.com/badges/image/martingabelmann/owncloud:archlinux.svg)](http://microbadger.com/images/martingabelmann/owncloud:archlinux "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/martingabelmann/owncloud:archlinux.svg)](http://microbadger.com/images/martingabelmann/owncloud:archlinux "Get your own version badge on microbadger.com")
 
 ### Table of Contents
  * [Features](#features)
