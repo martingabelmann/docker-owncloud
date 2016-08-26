@@ -1,8 +1,9 @@
 #OwnCloud with Docker
 _Based on Alpine_
 
-[![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=master)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
-[![](https://imagelayers.io/badge/martingabelmann/owncloud:latest.svg)](https://imagelayers.io/?images=martingabelmann/owncloud:owncloud9 'Get your own badge on imagelayers.io')
+[![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=alpine)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
+[![](https://images.microbadger.com/badges/image/martingabelmann/owncloud:alpine.svg)](http://microbadger.com/images/martingabelmann/owncloud:alpine "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/martingabelmann/owncloud:alpine.svg)](http://microbadger.com/images/martingabelmann/owncloud:alpine "Get your own version badge on microbadger.com")
 
 ---
 
