@@ -26,9 +26,34 @@ RUN apk update && apk upgrade &&\
     php5-curl php5-zip php5-json php5-dom php5-xmlreader php5-ctype php5-zlib \
     php5-iconv php5-xml php5-xmlrpc php5-posix php5-pcntl postgresql
 
-RUN /usr/bin/install -g apache -m 775  -d /run/apache2
-RUN /usr/bin/install -o postgres -d /var/log/postgresql
-RUN /usr/bin/install -o postgres -d /var/lib/postgresql/data
+RUN /usr/bin/install -g apache -m 775  -d /run/apache2 &&\
+    /usr/bin/install -o postgres -d /var/log/postgresql &&\
+    /usr/bin/install -o postgres -d /var/lib/postgresql/data &&\
+    sed -i '/Listen 80/a Listen 443' /etc/apache2/httpd.conf &&\
+    sed -i '/proxy_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/proxy_connect_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/proxy_ftp_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/proxy_http_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/proxy_wstunnel_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/proxy_ajp_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/proxy_balancer_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/ssl_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/cgi_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/mpm_prefork_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i '/mpm_event_module/s/^/#/g' /etc/apache2/httpd.conf &&\
+    sed -i '/rewrite_module/s/^#//g' /etc/apache2/httpd.conf &&\
+    sed -i 's/^;open_basedir.*$/open_basedir=\/var\/www\/localhost\/htdocs:\/tmp\/:\/dev\/urandom/' /etc/php5/php.ini &&\
+    sed -i '/extension=bz2/s/^;//g' /etc/php5/php.ini &&\
+    sed -i '/extension=bz2/a extension=apcu\.so' /etc/php5/php.ini &&\
+    sed -i '/extension=apcu/a extension=apc\.so' /etc/php5/php.ini &&\
+    sed -i '/extension=apc\.so/a apc\.enabled=1' /etc/php5/php.ini &&\
+    sed -i '/apc\.enabled=1/a apc\.shm_size=64M' /etc/php5/php.ini &&\
+    sed -i '/apc\.shm_size=64M/a apc\.ttl=7200' /etc/php5/php.ini &&\
+    sed -i '/apc\.ttl=7200/a apc\.enable_cli=1' /etc/php5/php.ini &&\
+    sed -i '/extension=gettext/s/^;//g' /etc/php5/php.ini &&\
+    sed -i '/extension=iconv/s/^;//g' /etc/php5/php.ini &&\
+    sed -i '/extension=xmlrpc/s/^;//g' /etc/php5/php.ini
+
 
 VOLUME ["/ssl", "/backup", "/var/www/localhost/htdocs"]
 
