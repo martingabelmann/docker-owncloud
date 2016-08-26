@@ -29,4 +29,5 @@ ${D}CONFIG = array (
     'mail_smtpsecure' => '$OC_MAIL_SMTPSECURE',
     'mail_smtppassword' => '$OC_MAIL_SMTPPASSWORD',
     'memcache.local' => '\\OC\\Memcache\\APCu',
+    'installed' => $OC_INSTALLED,
 );

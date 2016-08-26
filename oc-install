@@ -30,6 +30,7 @@ if [ "$DB_EXTERNAL" = false ]; then
     else
         echo '### existing postgres database found ###'
         start_psql
+        export OC_INSTALLED=true
     fi 
 
 fi

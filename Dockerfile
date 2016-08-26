@@ -33,8 +33,8 @@ ENV DB_TYPE=pgsql \
     OC_MAIL_SMTPPORT=465 \
     OC_MAIL_SMTPNAME=admin@localhost \
     OC_MAIL_SMTPSECURE=ssl \
-    OC_MAIL_SMTPPASSWORD=changemepls
-
+    OC_MAIL_SMTPPASSWORD=changemepls \
+    OC_INSTALLED=false
 
     
 RUN apk update && apk upgrade &&\
