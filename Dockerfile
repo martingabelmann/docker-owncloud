@@ -9,16 +9,33 @@ ENV DB_TYPE=pgsql \
     DB_PASS=changemepls \
     DB_EXTERNAL=false \
     OC_ADMIN=admin \
+    OC_EMAIL="admin@localhost" \
     OC_ADMINPASS=changemepls \
     OC_WWW=/var/www/localhost/htdocs \
     OC_DATADIR=/var/www/localhost/htdocs/data \
-    OC_EMAIL="admin@localhost" \
     OC_DOMAIN="localhost" \
     OC_BACKUP_CRON=no \
     OC_BACKUP_FILES=1 \
     OC_BACKUP_DIR=/backup \
     OC_TIME="Europe/Berlin" \
-    OC_LC="en_US.UTF-8"
+    OC_LC="en_US.UTF-8" \
+    OC_TRUSTED_DOMAINS="'localhost','127.0.0.1'," \
+    OC_LANGUAGE=en \
+    OC_DEFAULTAPP=files \
+    OC_OVERWRITEHOST="" \
+    OC_LOGLEVEL=1 \
+    OC_MAIL_FROM_ADDRESS=admin \
+    OC_MAIL_SMTPMODE=smtp \
+    OC_MAIL_DOMAIN=localhost \
+    OC_MAIL_SMTPAUTHTYPE=LOGIN \
+    OC_MAIL_SMTPAUTH=1 \
+    OC_MAIL_SMTPHOST='smtp.localhost' \
+    OC_MAIL_SMTPPORT=465 \
+    OC_MAIL_SMTPNAME=admin@localhost \
+    OC_MAIL_SMTPSECURE=ssl \
+    OC_MAIL_SMTPPASSWORD=changemepls
+
+
     
 RUN apk update && apk upgrade &&\
     apk add tzdata openssl ca-certificates apache2 apache2-ssl php5 php5-apache2 \
