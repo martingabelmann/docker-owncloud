@@ -12,6 +12,12 @@ ${D}CONFIG = array (
             "writable" => true,
         )
     ),
+    'dbtype' => '$DB_TYPE',
+    'dbname' => '$DB_NAME',
+    'dbhost' => '$DB_HOST',
+    'dbtableprefix' => '$DB_PREFIX',
+    'dbuser' => '$DB_USER',
+    'dbpassword' => '$DB_PASS',
     'trusted_domains' => array ($OC_TRUSTED_DOMAINS),
     'datadirectory' => '$OC_DATADIR',
     'default_language' => '$OC_LANGUAGE',
@@ -30,4 +36,5 @@ ${D}CONFIG = array (
     'mail_smtppassword' => '$OC_MAIL_SMTPPASSWORD',
     'memcache.local' => '\\OC\\Memcache\\APCu',
     'installed' => $OC_INSTALLED,
+    'version' => '$OC_VERSION',
 );
