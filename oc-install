@@ -15,11 +15,12 @@ if [ "$DB_EXTERNAL" = false ]; then
 
     if [ ! -d /var/lib/postgresql/data/base ]; then
 
+        chown postgres:postgres /var/lib/postgresql/data
+        chmod u=rwx,g-rwx,o-rwx /var/lib/postgresql/data
+
         echo '### no local postgres database found ###'
         echo '### installing database ###'
 
-        chown 70:70 /var/lib/postgresql/data
-        chmod u=rwx,g-rwx,o-rwx /var/lib/postgresql/data
         su - postgres -c "initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgresql/data'"
         start_psql
         sleep 2 #wait for postgres till started
