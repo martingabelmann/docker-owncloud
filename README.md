@@ -4,13 +4,11 @@ _Based on Alpine_
 [![Run Status](https://api.shippable.com/projects/5787cdab3be4f4faa56ccc34/badge?branch=master)](https://app.shippable.com/projects/5787cdab3be4f4faa56ccc34)
 [![](https://imagelayers.io/badge/martingabelmann/owncloud:latest.svg)](https://imagelayers.io/?images=martingabelmann/owncloud:owncloud9 'Get your own badge on imagelayers.io')
 
-### Table of Contents
+---
+
  * [Features](#features)
  * [Basic Usage](#basics)
  * [Backups](#backups)
-   * [Manual](#manual)
-   * [Automatic](#automatic)
-   * [Restore](#restore) 
  * [Testing](#testing)
  * [OwnCloud cli](#owncloud-cli)
 
@@ -68,7 +66,7 @@ The image provides a script called ``backup`` which is used to tar the data, con
  docker exec -ti oc backup [options]
  ```
  
- - To perform a new backup run ``backup -b``. The file is placed into ``data/backups`` and called like ``owncloud_yearmonthday_time.tar.gz``. Depending on the variable ``OC_BACKUP_FILES``  (default=1), old backupfiles will be deleted.
+ - To perform a new backup run ``backup -b``. The file is placed into ``/backups`` and called like ``owncloud_yearmonthday_time.tar.gz``. Depending on the variable ``OC_BACKUP_FILES``  (default=1), old backupfiles will be deleted.
 
 
 #####Automatic
@@ -88,6 +86,7 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -v /srv/docker/owncloud/config/:/var/www/localhost/htdocs/config/ \
   -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
   -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
+  -v /srv/docker/owncloud/backups/:/backups/ \
   -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
 ```
  

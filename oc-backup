@@ -5,8 +5,8 @@
 #count existing backup files
 function count_backups() {
     
-    if [ -d /srv/http/data/backups/ ]; then
-        echo $(ls -b /srv/http/data/backups/ | wc -l)
+    if [ -d /backups/ ]; then
+        echo $(ls -b /backups/ | wc -l)
     else
         echo 0
     fi
@@ -21,11 +21,11 @@ function remove_old_backups() {
 
     if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
         
-        OLDEST="$(ls -tr /srv/http/data/backups/ | head -n 1)"
+        OLDEST="$(ls -tr /backups/ | head -n 1)"
         echo "removing old backup file:"
         
-        if [ -f /srv/http/data/backups/$OLDEST ]; then  
-            rm -rfv /srv/http/data/backups/$OLDEST 
+        if [ -f /backups/$OLDEST ]; then  
+            rm -rfv /backups/$OLDEST 
         fi
         
         remove_old_backups $MAX_BACKUPS
@@ -81,24 +81,24 @@ if [ "$USAGE" = true ]; then
     
     echo "Usage:"
     echo "backup -b";
-    echo "tar owncloud data, config, apps and postgres database into backupdir {ownclouddir}/data/backups/. The backup is called  ${FILE}.";
+    echo "tar owncloud-web and postgresql into backupdir /backups. The backup is called  ${FILE}.";
     echo "";
     echo "backup -r backup.tar.gz";
-    echo "restore the file backup.tar.gz. It has to be located in {ownclouddir}/data/backups/";
+    echo "restore the file backup.tar.gz. It has to be located in /backups";
     exit 1;
 
 fi
 
 if [ "$BACKUP" != false ]; then
     
-    mkdir -p /srv/http/data/backups
+    mkdir -p /backups
     
     echo "compressing owncloud data, config and app files to $FILE ...";
-    tar --exclude=/srv/http/data/backups -cpf /srv/http/data/backups/$FILE /srv/http/data
+    tar -cpf /backups/$FILE /var/www/localhost/htdocs
 
     if [ "$DB_EXTERNAL" = false ]; then
         echo "appending postgres database to $FILE"
-        tar -upf /srv/http/data/backups/$FILE /var/lib/postgres/data/
+        tar -upf /backups/$FILE /var/lib/postgresql/data/
     fi
 
     remove_old_backups $OC_BACKUP_FILES
@@ -111,8 +111,8 @@ fi
 if [ "$RESTORE" != false ]; then
     
     echo "Restoring $RESTORE ...";
-    [ ! -f /srv/http/data/backups/$RESTORE ] && echo "fatal: file /srv/http/data/backups/$RESTORE not found." && exit 0;
-    tar -xpf /srv/http/data/backups/$RESTORE -C /
+    [ ! -f /backups/$RESTORE ] && echo "fatal: file /backups/$RESTORE not found." && exit 0;
+    tar -xpf /backups/$RESTORE -C /
     echo "done";
 
 fi
@@ -122,8 +122,8 @@ if [ "$LIST" != false ]; then
     BACKUP_COUNT=$(count_backups)
     if [ "$BACKUP_COUNT" -gt 0 ]; then
         echo "$BACKUP_COUNT available backup files:";
-        ls -gGth /srv/http/data/backups/|cut -d " " -f 3-
-        echo "Total: $(du -h /srv/http/data/backups/|awk '{print $1}')"
+        ls -gGth /backups/|cut -d " " -f 3-
+        echo "Total: $(du -h /backups/|awk '{print $1}')"
     else
         echo "No backup files found";
     fi
