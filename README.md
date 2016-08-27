@@ -39,28 +39,24 @@ choose a good database- and adminpassword, then type:
 docker run --name=oc -d -p 443:443 -p 80:80 \
   -e DB_PASS=changemepls -e OC_ADMINPASS=changemepls \
   -e OC_DOMAIN=example.org -e OC_EMAIL=admin@example.org \
-  -v /srv/docker/owncloud/data/:/var/www/localhost/htdocs/data/ \
-  -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
-  -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
-  -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud:alpine
+  -v /srv/docker/owncloud/:/owncloud/ martingabelmann/owncloud:alpine
 ```
 
 This will mount and use the certificates. Your {data,config,additional apps} are stored on your host at ``/srv/docker/owncloud/{data,config,apps}`` and the postgres database at ``/srv/docker/owncloud/sql``. 
 
 
-The first run will take a while because the recent owncloud-version will be downloaded and exctracted. 
-
 Check ``docker logs oc`` to verify that everything is done. Then point your browser to ``https://example.org/``. On the first vistit/install Owncloud will do some configurations and directly login into to the admin panel.
 
 ##### Persistent configs
 **All** files locatet at ``/tpl`` are copied to the filesystems root ``/`` relative to ``/tpl/``. 
-For instance the preexisting file ``/tpl/var/www/localhost/htdocs/config/config.php`` is copied to ``/var/www/localhost/htdocs/config/config.php``.
+For instance the preexisting file ``/tpl/etc/apache2/conf.d/httpd-vhosts.conf`` is copied to ``/etc/apache2/conf.d/httpd-vhosts.conf``.
 Simultaneously the installation uses the tool ``envsubst`` to replace all bash variables with variables passed with the ``-e`` option. 
 For php files this means, that you cannot simply write ``$phpvariable='"$OC_DOMAIN"';``, since the ``$phpvarvariable`` would be substituted too (with nothing if its not defined). 
 There is an exported variable ``${D}`` containing the dollar sign:  ``${D}phpvariable='"$OC_DOMAIN"';`` will lead to the desired result (e.g. ``$phpvariable='example.org';``).
 
-You can mount your own config into ``/tpl`` and use your own environment variables with ``-e``.
-
+You can mount your own config into ``/tpl`` and use your own environment variables with ``-e``.  
+  
+_Exception:_ the configs under ``/tpl/var/www/localhost/htdocs/config`` are only for new installs. For existing OwnCloud installations the files from ``/owncloud/config`` are used.
 
 #### Backups
 The image provides a script called ``backup`` which is used to tar the data, config, apps and sql directories into OC_BACKUP_DIR and extract existing tarfiles from there into the corresponig destinations.
@@ -91,11 +87,8 @@ docker run --name=oc -d -p 443:443 -p 80:80 \
   -e OC_DOMAIN=example.org -e OC_EMAIL=admin@example.org \
   -e OC_BACKUP_FILES=2 \
   -e OC_BACKUP_CRON='@midnight' \
-  -v /srv/docker/owncloud/data/:/var/www/localhost/htdocs/data/ \
-  -v /srv/docker/owncloud/apps/:/var/www/localhost/htdocs/apps2/ \
-  -v /srv/docker/owncloud/sql/:/var/lib/postgresql/data/ \
-  -v /srv/docker/owncloud/backups/:/backups/ \
-  -v /srv/docker/owncloud/ssl/:/ssl/ martingabelmann/owncloud
+  -v /srv/backups/owncloud:/backups/ \
+  -v /srv/docker/owncloud/:/owncloud martingabelmann/owncloud
 ```
  
 ##### Restore

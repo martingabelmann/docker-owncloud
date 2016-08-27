@@ -41,9 +41,15 @@ RUN apk update && apk upgrade &&\
     php5-curl php5-zip php5-json php5-dom php5-xmlreader php5-ctype php5-zlib \
     php5-iconv php5-xml php5-xmlrpc php5-posix php5-pcntl postgresql gettext
 
+VOLUME ["/owncloud", "/backup"]
+
+WORKDIR /var/www/localhost/htdocs
+
 RUN /usr/bin/install -g apache -m 775  -d /run/apache2 &&\
     /usr/bin/install -o postgres -d /var/log/postgresql &&\
-    /usr/bin/install -o postgres -d /var/lib/postgresql/data &&\
+    wget https://download.owncloud.com/download/community/setup-owncloud.php -O "/var/www/localhost/htdocs/setup-owncloud.php" &&\
+    echo ""| php -R 'include("/var/www/localhost/htdocs//setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.' &&\
+    rm -f "$OC_WWW"/setup-owncloud.php &&\
     sed -i '/Listen 80/a Listen 443' /etc/apache2/httpd.conf &&\
     sed -i '/proxy_module/s/^#//g' /etc/apache2/httpd.conf &&\
     sed -i '/proxy_connect_module/s/^#//g' /etc/apache2/httpd.conf &&\
@@ -57,7 +63,7 @@ RUN /usr/bin/install -g apache -m 775  -d /run/apache2 &&\
     sed -i '/mpm_prefork_module/s/^#//g' /etc/apache2/httpd.conf &&\
     sed -i '/mpm_event_module/s/^/#/g' /etc/apache2/httpd.conf &&\
     sed -i '/rewrite_module/s/^#//g' /etc/apache2/httpd.conf &&\
-    sed -i 's/^;open_basedir.*$/open_basedir=\/var\/www\/localhost\/htdocs:\/tmp\/:\/dev\/urandom/' /etc/php5/php.ini &&\
+    sed -i 's/^;open_basedir.*$/open_basedir=\/owncloud:\/var\/www\/localhost\/htdocs:\/tmp\/:\/dev\/urandom/' /etc/php5/php.ini &&\
     sed -i '/extension=bz2/s/^;//g' /etc/php5/php.ini &&\
     sed -i '/extension=bz2/a extension=apcu\.so' /etc/php5/php.ini &&\
     sed -i '/extension=apcu/a extension=apc\.so' /etc/php5/php.ini &&\
@@ -69,22 +75,16 @@ RUN /usr/bin/install -g apache -m 775  -d /run/apache2 &&\
     sed -i '/extension=iconv/s/^;//g' /etc/php5/php.ini &&\
     sed -i '/extension=xmlrpc/s/^;//g' /etc/php5/php.ini
 
-
-VOLUME ["/ssl", "/backup", "/var/www/localhost/htdocs", "/tpl"]
-
 ADD oc-install /usr/local/bin/oc-install
 ADD oc-perms /usr/local/bin/oc-perms
 ADD oc-backup /usr/local/bin/backup
 ADD occ /usr/local/bin/occ
 ADD tpl /tpl
-ADD server.key /ssl/server.key
-ADD server.crt /ssl/server.crt
-
+ADD server.key /owncloud/ssl/server.key
+ADD server.crt /owncloud/ssl/server.crt
 
 EXPOSE 80
 EXPOSE 433
-
-WORKDIR /var/www/localhost/htdocs
 
 ENTRYPOINT ["oc-install"]
 CMD ["/usr/sbin/httpd", "-kstart",  "-DFOREGROUND"] 

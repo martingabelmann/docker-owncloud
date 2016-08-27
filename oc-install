@@ -7,21 +7,41 @@ set -o pipefail
 ##function definitions
 start_psql() {
     echo '### starting database server ###'
-    su - postgres -c "pg_ctl start -D /var/lib/postgresql/data -l /var/log/postgresql/log"
+    su - postgres -c "pg_ctl start -D /owncloud/sql -l /var/log/postgresql/log"
+}
+
+link() {
+    if [ ! -L "$1" ]; then
+
+        if [ ! -d "$2" ] && [ -d "$1" ]; then
+            mv "$1" "$2"
+        fi
+        rm -rf "$1"
+        ln -s "$2" "$1"
+    fi
 }
 
 
+if [ ! -e /srv/installed ]; then
+    echo '### symlinking mounts ###'
+    link /var/www/localhost/htdocs/data /owncloud/data
+    link /var/www/localhost/htdocs/apps2 /owncloud/apps
+    link /var/www/localhost/htdocs/config /owncloud/config
+    mkdir -m 0750 -p /owncloud/data /owncloud/apps /owncloud/config
+    mkdir -p /owncloud/sql
+    chmod u=rwx,g-rwx,o-rwx /owncloud/sql
+    chown -R postgres:postgres /owncloud/sql
+    chown -R apache:apache /owncloud/data /owncloud/apps /owncloud/config
+fi
+
 if [ "$DB_EXTERNAL" = false ]; then
 
-    if [ ! -d /var/lib/postgresql/data/base ]; then
-
-        chown postgres:postgres /var/lib/postgresql/data
-        chmod u=rwx,g-rwx,o-rwx /var/lib/postgresql/data
-
+    if [ ! -d /owncloud/sql/base ]; then
+        
         echo '### no local postgres database found ###'
         echo '### installing database ###'
 
-        su - postgres -c "initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgresql/data'"
+        su - postgres -c "initdb --locale en_US.UTF-8 -E UTF8 -D '/owncloud/sql'"
         start_psql
         sleep 2 #wait for postgres till started
         echo '### create Owncloud Database and -user ###'
@@ -34,40 +54,6 @@ if [ "$DB_EXTERNAL" = false ]; then
 
 fi
 
-
-   
-if [ ! -e "$OC_WWW/index.php" ]; then
-    
-    echo '### no owncloud webfiles found ###'
-    mkdir -p "$OC_WWW/data" "$OC_WWW/apps2" 
-    echo '### downloading owncloud webinstaller ###'
-    wget https://download.owncloud.com/download/community/setup-owncloud.php -O "$OC_WWW/setup-owncloud.php"
-   
-    echo '### running owncloud webinstaller ###'
-    echo '...this may take a while...'
-    echo ""| php -R 'include("'$OC_WWW'/setup-owncloud.php");' -B 'parse_str($argv[1], $_GET);' 'step=2&directory=.'
-    rm -f "$OC_WWW"/setup-owncloud.php
-fi
-
-
-echo '### copying templates from /tpl ###'
-
-# usethis variable to write he dollar e.g.: 
-#    $config = $bash_var; 
-# goes to  
-#    ${D}config = $bash_var;
-# where config is a php variable set to the content of the bash variable "$bash_var"
-export D='$'
-
-for tpl in $(find /tpl -type f); do 
-    destination=${tpl#/tpl}
-    echo "$tpl >> $destination"
-    mkdir -p "${destination%/*}"
-    echo "$(envsubst < $tpl)" > "$destination"
-done
-
-
-
 if [ ! -e /srv/installed ]; then
     echo "### set timezone to $OC_TIME ###"
     ln -sf /usr/share/zoneinfo/$OC_TIME /etc/localtime
@@ -77,9 +63,24 @@ if [ ! -e /srv/installed ]; then
     #echo -e "LANG=$OC_LC\nLC_MESSAGES=$OC_LC\nLC_MONETARY=$OC_LC\nLC_NUMERIC=$OC_LC\nLC_TIME=$OC_LC" > /etc/locale.conf
     #locale-gen
 
-    echo '### fixing directory premissions ###'    
-    #from https://wiki.archlinux.org/index.php/OwnCloud
-    /usr/local/bin/oc-perms
+    echo '### copying templates from /tpl ###'
+    # usethis variable to write he dollar e.g.: 
+    #    $config = $bash_var; 
+    # goes to  
+    #    ${D}config = $bash_var;
+    # where config is a php variable set to the content of the bash variable "$bash_var"
+    export D='$'
+    if [ -e "/owncloud/config/config.php" ]; then
+        # dont copy configs if they are already mounted
+        rm -f "/tpl/$OC_WWW/config/config.php"
+        rm -f "/tpl/$OC_WWW/config/autoconfig.php"
+    fi   
+    for tpl in $(find /tpl -type f); do 
+        destination=${tpl#/tpl}
+        echo "$tpl >> $destination"
+        mkdir -p "${destination%/*}"
+        echo "$(envsubst < $tpl)" > "$destination"
+    done
 
     echo '### configuring apache ###'
     sed -i 's/ServerAdmin.*$/ServerAdmin '"$OC_EMAIL"'/g' /etc/apache2/httpd.conf 
@@ -92,6 +93,9 @@ if [ ! -e /srv/installed ]; then
        crond -b -L /var/log/cron.log
     fi
  
+    echo '### fixing directory premissions ###'    
+    #from https://wiki.archlinux.org/index.php/OwnCloud
+    /usr/local/bin/oc-perms
 
     echo '### Gratulations! Point your browser to your new owncloud instance. ###'
     touch /srv/installed
