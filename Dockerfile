@@ -86,8 +86,7 @@ ADD tpl /tpl
 ADD server.key /owncloud/ssl/server.key
 ADD server.crt /owncloud/ssl/server.crt
 
-EXPOSE 80
-EXPOSE 433
+EXPOSE 80 433
 
 ENTRYPOINT ["oc-install"]
 CMD ["/usr/sbin/httpd", "-kstart",  "-DFOREGROUND"] 
