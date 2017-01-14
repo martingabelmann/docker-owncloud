@@ -25,13 +25,13 @@ Get the image:
 docker pull martingabelmann/owncloud
 ```
 
-It is highly recommended to use owncloud with ssl, so the apache-settings are forcing the browser to use ``https://``. There are certificates build in the image for testing but in production you`ll have to use your own:
+It is highly recommended to use owncloud with SSL. The default Apache setting of this container forces the browser to use ``https://``. There are certificates build in the image for testing but in production you`ll have to use your own:
 
-Assuming you owning (trusted) ssl-certificates at 
+Assuming you are owning (trusted) ssl-certificates at 
  - ``/srv/docker/owncloud/ssl/server.key`` and 
  - ``/srv/docker/owncloud/ssl/server.crt``,
  
-that are beloging to the domain  ``example.org``,
+which belong to the domain ``example.org``,
 
 choose a good database- and adminpassword, then type:
   
@@ -120,8 +120,9 @@ docker exec oc occ help
 
 
 #### Upgrades 
-Because the install script is downloading the newest stable version, updates can be easily done by removing the running container and starting a new one. Since the apps arent effected they will be upgraded by the webinterface on the next visit or via the command line. 
-
+### OwnCloud
+The used Owncloud instance is updated frequently due to the automated build (linked to alpine and the official owncloud image). Thus updates are performed by pulling the newest image, moving the running container and starting a new one. Since the apps arent effected they will be upgraded by the webinterface on the next visit or via the command line. 
+  
 I recommend to upgrade via `occ`:
 ```
 docker exec oc occ upgrade
@@ -141,3 +142,6 @@ for compatiblity. If it fails, install the newest/compatible version by copying 
 docker exec oc app:enable APPNAME
 ```
 If everything was successful you should be able to visit the webinterface again.
+
+### Postgresql
+Upgrading to major postgres versions in a docker environment [can be very painful](https://github.com/docker-library/postgres/issues/37). I recommend to spawn an alpine container from the previous image, run pg_dumpall and import the dump manually with the newer postgres.
