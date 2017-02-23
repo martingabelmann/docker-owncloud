@@ -6,7 +6,7 @@ build:
   ci:
     - >
       while ! docker logs --tail=5 oc |& grep 'Gratulations'; do
-          sleep 1 && ((c++)) && ((c==40)) && exit 1
+          sleep 1 && ((c=c+1)) && ((c!=40)) && exit 1
       done;
     - docker logs oc
     - docker exec oc occ "--no-ansi maintenance:install --database pgsql --database-name owncloud_db --database-user owncloud --database-pass changemepls --admin-user admin --admin-pass changemepls"
