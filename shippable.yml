@@ -4,9 +4,8 @@ build:
     - docker rm -f oc || true
     - docker run -d --name=oc test/owncloud:latest
   ci:
-
     - >
-      while [ ! -n "$(docker logs --tail=5 oc|grep 'Gratulations')" ]; do
+      while docker logs --tail=5 oc|grep 'Gratulations'; do
           sleep 1 && ((c++)) && ((c==40)) && exit 1
       done;
     - docker logs oc
