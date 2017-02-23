@@ -12,6 +12,6 @@ build:
     - docker exec oc occ "--no-ansi maintenance:install --database pgsql --database-name owncloud_db --database-user owncloud --database-pass changemepls --admin-user admin --admin-pass changemepls"
     - sleep 3
     - docker exec oc occ "--no-ansi status"
-    - docker exec -ti oc cat /var/log/postgresql/log
-    - docker exec -ti oc cat /var/log/apache2/error.log
-    - docker exec -ti oc cat /var/log/apache2/ssl_error.log
+    - docker exec oc cat /var/log/postgresql/log
+    - docker exec oc cat /var/log/apache2/error.log
+    - docker exec oc cat /var/log/apache2/ssl_error.log
