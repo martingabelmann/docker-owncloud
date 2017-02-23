@@ -7,7 +7,7 @@ set -o pipefail
 ##function definitions
 start_psql() {
     echo '### starting database server ###'
-    su - postgres -c "pg_ctl start -D /owncloud/sql -l /var/log/postgresql/log"
+    su - postgres -c "pg_ctl start -D /owncloud/sql -l /var/log/postgresql/log -o $DB_OPTS"
 }
 
 link() {

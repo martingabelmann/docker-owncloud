@@ -8,6 +8,7 @@ ENV DB_TYPE=pgsql \
     DB_PREFIX="" \
     DB_PASS=changemepls \
     DB_EXTERNAL=false \
+    DB_OPTS="'-N50 -B64'" \
     SSL_CERTIFICATE_FILE="/owncloud/ssl/server.crt" \
     SSL_CERTIFICATE_KEY_FILE="/owncloud/ssl/server.key" \
     SSL_CERTIFICATE_CHAIN_FILE="/owncloud/ssl/server.crt" \
